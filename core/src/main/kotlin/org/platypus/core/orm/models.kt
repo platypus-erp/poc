@@ -26,19 +26,7 @@ open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
 
 sealed class AbstractPlatypusModel<E : PlatypusEntity> {
 
-    val newfield = PlatypusPropertyFactory<E>()
-
-    protected fun onChange(comp: (entity: E, param: OnChangeResult<E>) -> Unit) = OnChangeMethodDef(comp)
-
-//    protected fun privateMutli(comp: (entity: E, Super: MutliMethodContext<E>) -> Unit) = MultiMethodDef(comp)
-//    fun m2m(refName: String): M2MColumn {
-//        return m2mByName[refName] ?: throw NotFoundException("Many2Many column $refName not found in de model ${this::class.simpleName}")
-//    }
-//    protected fun computeGet(vararg depends: Column<*>, comp: (entity: E, Super: ComputeMethod<E>) -> Unit) =
-//            ComputeMethodDef(depends.toMutableSet(), ComputeType.GET, comp)
-//
-//    protected fun computeSet(vararg depends: Column<*>, comp: (entity: E, Super: ComputeMethod<E>) -> Unit) =
-//            ComputeMethodDef(depends.toMutableSet(), ComputeType.SET, comp)
+    protected val newfield = PlatypusPropertyFactory<E>()
 
 }
 
@@ -47,7 +35,10 @@ open class Model<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
 
     protected val newMethod = PlatypusMethodsFactory<E>()
 
-    fun onChangeGroup(vararg props: PlatypusProperty) = OnChangeGroup<E>(props)
+    fun compute(strProp:PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
+    fun computeStore(strProp:PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
+
+
 
 
 }
@@ -55,23 +46,23 @@ open class Model<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
 open class Many2ManyModel(tableName: String = "") {
     val table = PlatypusTable(tableName)
 
-    protected fun ref(name: String, target: AbstractPlatypusModel<*>, refOpt: ReferenceOption? = null): Column<EntityID<Int>> =
-            table.reference(name, target.table, refOpt)
+    protected fun ref(name: String, target: PlatypusTable, refOpt: ReferenceOption? = null): Column<EntityID<Long>> =
+            table.reference(name, target, refOpt)
 
 }
 
 
-open class TemporaryModel<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>(tableName) {
+open class TemporaryModel<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>() {
 
 
 }
 
-open class View<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>(tableName) {
+open class View<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>() {
 
 
 }
 
-open class MaterializedView<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>(tableName) {
+open class MaterializedView<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>() {
 
 
 }

@@ -1,5 +1,6 @@
 package org.platypus.core.orm.fields
 
+import org.jetbrains.exposed.sql.ColumnType
 import org.platypus.core.SelectionValueNotFound
 
 /**
@@ -38,3 +39,36 @@ fun disable(v: SelectionValue) {
 }
 
 data class SelectionValue(val value: String, val active: Boolean, val label: String)
+
+class KassiopiaSelectionColumnType<out T:SelectionType>(
+        private val tableHolderName: String,
+        private val fieldName: String,
+        val type:T,
+        private val defaultValue:T?,
+        private val required: Boolean,
+        private val readonly: Boolean
+): ColumnType(!required){
+    override fun sqlType() = "VARCHAR(30)"
+
+    override fun valueFromDB(value: Any): Any {
+        val res = super.valueFromDB(value)
+        return when(res){
+            is SelectionValue -> res
+            is String -> SelectionRegistry.getFromValue(this, res)
+            else -> throw SelectionValueNotFound(type, res)
+        }
+    }
+
+    override fun valueToString(value: Any?): String {
+        val r = value ?: defaultValue
+        return super.valueToString(r)
+    }
+
+    override fun notNullValueToDB(value: Any): Any {
+        return when(value){
+            is SelectionValue -> value.value
+            is String -> value
+            else -> throw SelectionValueNotFound(type, value)
+        }
+    }
+}

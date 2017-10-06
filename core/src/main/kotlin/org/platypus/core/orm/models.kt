@@ -25,144 +25,8 @@ open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
 }
 
 sealed class AbstractPlatypusModel<E : PlatypusEntity> {
-    protected fun string(string: String? = null,
-                         help: String? = null,
-                         pattern: String? = null,
-                         minSize: Int = Int.MIN_VALUE,
-                         maxSize: Int = Int.MAX_VALUE,
-                         defaultValue: String? = null,
-                         prefix: String? = null,
-                         suffix: String? = null,
-                         required: Boolean? = null,
-                         allowBlank: Boolean? = null,
-                         readonly: Boolean? = null,
-                         translate: Boolean? = null,
-                         trim: TrimType = TrimType.NONE,
-                         ecripted: Boolean? = null
-    ) = PlatypusStringProperty<E>(
-            string = string ?: "",
-            help = help ?: "",
-            regexp = pattern?.toRegex(),
-            minSize = if (minSize == Int.MAX_VALUE) 0 else maxSize,
-            maxSize = if (maxSize == Int.MAX_VALUE) 65 else maxSize,
-            defaultValue = defaultValue ?: "",
-            prefix = prefix ?: "",
-            suffix = suffix ?: "",
-            required = required ?: false,
-            allowBlank = allowBlank ?: true,
-            readonly = readonly ?: true,
-            trim = trim,
-            ecripted = ecripted ?: false)
 
-    protected fun date(string: String? = null,
-                       help: String? = null,
-                       min: LocalDate? = null,
-                       max: LocalDate? = null,
-                       defaultValue: LocalDate? = null,
-                       required: Boolean? = null,
-                       readonly: Boolean? = null) =
-            PlatypusDateProperty(
-                    string = string ?: "",
-                    min = min ?: LocalDate.MIN,
-                    max = max ?: LocalDate.MAX,
-                    defaultValue = defaultValue ?: LocalDate.MIN,
-                    required = required ?: false,
-                    readonly = readonly ?: false)
-
-    protected fun datetime(string: String? = null,
-                           help: String? = null,
-                           min: LocalDateTime? = null,
-                           max: LocalDateTime? = null,
-                           defaultValue: LocalDateTime? = null,
-                           required: Boolean? = null,
-                           readonly: Boolean? = null
-    ) = PlatypusDateTimeProperty(
-            string = string ?: "",
-            help = help ?: "",
-            min = min ?: LocalDateTime.MIN,
-            max = max ?: LocalDateTime.MAX,
-            defaultValue = defaultValue ?: LocalDateTime.MIN,
-            required = required ?: false,
-            readonly = readonly ?: false)
-
-    protected fun text(string: String? = null,
-                       help: String? = null,
-                       length: Int? = null,
-                       required: Boolean? = null,
-                       widget: ColumnWidget? = null)
-            = PlatypusTextProperty(string ?: "",
-            help = help ?: "",
-            length = length ?: 65535,
-            required = required ?: false,
-            widget = widget ?: HtmlWidget())
-
-    protected fun integer(string: String? = null,
-                          help: String? = null,
-                          max: Int? = null,
-                          min: Int? = null,
-                          required: Boolean? = null,
-                          widget: ColumnWidget? = null)
-            = PlatypusIntegerProperty(string ?: "",
-            help = help ?: "",
-            max = max ?: 65535,
-            min = min ?: 65535,
-            required = required ?: false,
-            widget = widget ?: HtmlWidget())
-
-    protected fun long(string: String? = null,
-                       help: String? = null,
-                       max: Long? = null,
-                       min: Long? = null,
-                       required: Boolean? = null,
-                       widget: ColumnWidget? = null)
-            = PlatypusLongProperty(string ?: "",
-            help = help ?: "",
-            max = max ?: 65535,
-            min = min ?: 65535,
-            required = required ?: false,
-            widget = widget ?: HtmlWidget())
-
-    protected fun decimal(string: String? = null,
-                          help: String? = null,
-                          max: Float? = null,
-                          min: Float? = null,
-                          required: Boolean? = null,
-                          widget: ColumnWidget? = null)
-            = PlatypusDecimalProperty(string ?: "",
-            help = help ?: "",
-            max = max ?: 65535F,
-            min = min ?: 65535F,
-            required = required ?: false,
-            widget = widget ?: HtmlWidget())
-
-    protected fun boolean(string: String? = null,
-                          help: String? = null,
-                          required: Boolean? = null,
-                          widget: ColumnWidget? = null)
-            = PlatypusBooleanProperty(string ?: "",
-            help = help ?: "",
-            required = required ?: false,
-            widget = widget ?: HtmlWidget())
-
-    fun <T : SelectionType> selection(columnName: String,
-                                      selection: T,
-                                      string: String = columnName,
-                                      help: String = "",
-                                      required: Boolean? = null,
-                                      readonly: Boolean? = null,
-                                      wiget: ColumnWidget? = null) {
-    }
-
-    protected fun one2many(string: String? = null,
-                           help: String? = null) = KassiopiaO2MColumnTmp(this, "")
-
-    protected fun many2many(string: String? = null,
-                            help: String? = null) = KassiopiaM2MColumnTmp(this, "")
-
-    protected fun many2one(string: String? = null,
-                           help: String? = null,
-                           required: Boolean? = null,
-                           readonly: Boolean? = null) = KassiopiaM2OColumnTmp()
+    val newfield = PlatypusPropertyFactory<E>()
 
     protected fun onChange(comp: (entity: E, param: OnChangeResult<E>) -> Unit) = OnChangeMethodDef(comp)
 
@@ -179,9 +43,13 @@ sealed class AbstractPlatypusModel<E : PlatypusEntity> {
 }
 
 open class Model<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
-    val id = long()
+    val id = newfield.long()
+
+    protected val newMethod = PlatypusMethodsFactory<E>()
 
     fun onChangeGroup(vararg props: PlatypusProperty) = OnChangeGroup<E>(props)
+
+
 }
 
 open class Many2ManyModel(tableName: String = "") {

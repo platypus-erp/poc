@@ -3,6 +3,8 @@ package org.platypus.core.orm
 import org.platypus.core.MutliMethodContext
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Column
+import org.platypus.core.orm.methods.MultiMethodResult
+import org.platypus.core.orm.methods.OnChangeResult
 
 /**
  * @author chmuchme
@@ -10,6 +12,14 @@ import org.jetbrains.exposed.sql.Column
  * on 27/08/17.
  */
 interface Method
+
+
+class PlatypusMethodsFactory<ENTITY:PlatypusEntity>{
+
+    fun <PARAM> multi(comp: (entity: ENTITY, param: PARAM, res: MultiMethodResult<ENTITY, PARAM>) -> Unit){}
+    fun one(){}
+    fun model(){}
+}
 
 enum class ComputeType {
     GET, SET, UNKNOW

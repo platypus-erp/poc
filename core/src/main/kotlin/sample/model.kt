@@ -28,7 +28,7 @@ object Partner : Model<PartnerEntity>() {
     val name = newfield.string()
     //Compute String Field
     val displayName = compute(newfield.string())
-    val ref = newfield.string(string = "Internal Reference")
+    val ref = computeStore(newfield.string(string = "Internal Reference"))
     val date = newfield.date()
     val title = newfield.many2one("title") of PartnerTitle
     val parent = newfield.many2one("parent") of Partner
@@ -75,6 +75,9 @@ object Partner : Model<PartnerEntity>() {
 
     val compute_get_name = displayName.getter { e, c -> c.Super(e) }
     val compute_set_name = displayName.setter { e, v, c -> c.Super(e, v) }
+
+    val compute_get_ref = ref.getter { e, c -> c.Super(e) }
+    val compute_set_ref = ref.setter { e, v, c -> c.Super(e, v) }
 
 
 

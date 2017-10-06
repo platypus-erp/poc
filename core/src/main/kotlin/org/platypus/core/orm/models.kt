@@ -26,7 +26,8 @@ open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
 
 sealed class AbstractPlatypusModel<E : PlatypusEntity> {
 
-    protected val newfield = PlatypusPropertyFactory<E>()
+    protected val newfield = PlatypusPropertyFactory(this)
+    fun compute(strProp:PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 
 }
 
@@ -35,7 +36,6 @@ open class Model<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
 
     protected val newMethod = PlatypusMethodsFactory<E>()
 
-    fun compute(strProp:PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
     fun computeStore(strProp:PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 
 

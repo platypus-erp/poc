@@ -16,7 +16,7 @@ import java.time.LocalTime
  * on 27/08/17.
  */
 
-class PlatypusPropertyFactory<E : PlatypusEntity>(private val model:Model<E>) {
+class PlatypusPropertyFactory<E : PlatypusEntity>(private val model:AbstractPlatypusModel<E>) {
 
 
     fun string(string: String? = null,

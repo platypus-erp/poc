@@ -14,14 +14,14 @@ import java.time.ZoneOffset
 class PlatypusDateProperty<E : PlatypusEntity>(
         string: String,
         help: String,
-        private val min: LocalDate,
-        private val max: LocalDate,
-        private val defaultValue: LocalDate,
-        private val required: Boolean,
-        private val readonly: Boolean
+        var min: LocalDate,
+        var max: LocalDate,
+        var defaultValue: LocalDate,
+        var required: Boolean,
+        var readonly: Boolean
 ) : PlatypusProperty(string, help)
 
-class KassiopiaDateColumnType(
+class PlatypusDateColumnType(
         private val tableHolderName: String,
         private val fieldName: String,
         private val min: LocalDate,

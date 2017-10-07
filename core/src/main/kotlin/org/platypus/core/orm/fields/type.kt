@@ -12,7 +12,7 @@ import java.util.*
 internal val DEFAULT_DATE_STRING_FORMATTER = DateTimeFormatter.ofPattern("YYYY-MM-dd").withLocale(Locale.ROOT)
 internal val DEFAULT_DATE_TIME_STRING_FORMATTER = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss.SSSSSS").withLocale(Locale.ROOT)
 
-abstract class KassiopiaColumnType<T : Any>(override var nullable: Boolean = false) : ColumnType() {
+abstract class PlatypusColumnType<T : Any>(override var nullable: Boolean = false) : ColumnType() {
 
     fun validate(valueNull: Any?):Set<String>{
         val typedValue = asType(valueNull)

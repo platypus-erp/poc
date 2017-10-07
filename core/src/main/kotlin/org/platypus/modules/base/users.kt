@@ -92,7 +92,7 @@ object Groups : Model<GroupsEntity>() {
     val comment = text("Comment", length = 250, translate = true)
     val category = string("category", "Application")
     val color = integer("color", "Color Index")
-    //    val full_name = function(_get_full_name, type='char', string='Group Name', fnct_search=_search_group),
+    //    val full_name = function(_get_full_name, type='char', stringColumn='Group Name', fnct_search=_search_group),
     val full_name = string("full_name", string = "Group Name")
     val share = boolean("share", "Share Group",
             help = "Group created to set access rights for sharing data with some users.")

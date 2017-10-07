@@ -2,6 +2,7 @@ package org.platypus.core.orm.fields
 
 import org.jetbrains.exposed.sql.IColumnType
 import org.jetbrains.exposed.sql.StringColumnType
+import org.platypus.addIf
 import org.platypus.core.orm.PlatypusEntity
 import org.platypus.core.orm.methods.*
 
@@ -50,7 +51,7 @@ class ComputeStorePlatypusStringProperty<E : PlatypusEntity>(prop: PlatypusStrin
     fun setter(comp: (entity: E, value: String, param: ComputeSetStringResult<E>) -> Unit) = ComputeSetStringMethodDef(comp)
 }
 
-class KassiopiaStringColumnType(
+class PlatypusStringColumnType(
         private val tableHolderName: String,
         private val fieldName: String,
         private val regexp: Regex?,
@@ -65,7 +66,7 @@ class KassiopiaStringColumnType(
         private val trim: TrimType,
         private val ecripted: Boolean,
         private val exposedType: StringColumnType = StringColumnType(maxSize)
-) : IColumnType by exposedType, KassiopiaColumnType<String>(!required) {
+) : IColumnType by exposedType, PlatypusColumnType<String>(!required) {
 
     override fun asType(v: Any?): String? = v as String?
 

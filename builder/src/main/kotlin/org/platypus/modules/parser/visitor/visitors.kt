@@ -1,6 +1,7 @@
 package org.platypus.modules.parser.visitor
 
 import org.antlr.v4.runtime.tree.RuleNode
+import org.platypus.modules.data.ParseResult
 import org.platypus.modules.lang.kotlin.KotlinParser
 import org.platypus.modules.lang.kotlin.KotlinParserBaseVisitor
 import org.platypus.modules.parser.generator.orm.exposed.firstLetterUpper
@@ -30,10 +31,7 @@ enum class FieldType{
 }
 data class ModelField(val name: String, val type: String, val target: String, val ftype:FieldType = FieldType.FIELD)
 open class Model(val name: String, val fields: Set<ModelField> = mutableSetOf(), val root:Boolean = true)
-data class ParseResult(var packageModel: String = "",
-                       val models: MutableSet<Model> = mutableSetOf(),
-                       val imports: MutableMap<String, String> = mutableMapOf(),
-                       val errors: MutableSet<String> = mutableSetOf())
+
 class M2MModel(modelName: String,
                fieldName: String,
                targetModelName: String,
@@ -92,13 +90,13 @@ object FileParser : KotlinParserBaseVisitor<ParseResult>() {
     }
 }
 
-private object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
+object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
 
     override fun visitObjectDeclaration(ctx: KotlinParser.ObjectDeclarationContext): ParseResultObject? {
         val gg = ctx.supertypesSpecifiers()
         return if (gg != null && ValidatorObject.visitSupertypesSpecifiers(gg)) {
             println("Parsing ${ctx.SimpleName().text}")
-            ParseResultObject(Model(ctx.SimpleName().text, PropertyVisitor.visitObjectDeclaration(ctx)), mutableSetOf())
+            ParseResultObject(Model(ctx.SimpleName().text, SimplePropertyVisitor.visitObjectDeclaration(ctx)), mutableSetOf())
         } else {
             null
         }
@@ -109,7 +107,7 @@ private object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
     }
 }
 
-private object ValidatorObject : KotlinParserBaseVisitor<Boolean>() {
+object ValidatorObject : KotlinParserBaseVisitor<Boolean>() {
 
     override fun visitSupertypesSpecifiers(ctx: KotlinParser.SupertypesSpecifiersContext): Boolean {
         return ctx.delegationSpecifier()
@@ -135,60 +133,8 @@ private object ValidatorObject : KotlinParserBaseVisitor<Boolean>() {
     }
 }
 
-private object PropertyVisitor : KotlinParserBaseVisitor<Set<ModelField>>() {
 
-    override fun visitPropertyDeclaration(ctx: KotlinParser.PropertyDeclarationContext): Set<ModelField> {
-        if (ctx.expression() != null){
-            println("Parsing field ${ctx.variableDeclarationEntry().SimpleName()}")
-            if (ctx.modifiers().text != "public") {
-                //error modifier should be public on none
-            }
-            if (ctx.multipleVariableDeclarations() != null) {
-                // error only on field par line
-            }
-            val typeName = PropertyTypeVisitor.visitExpression(ctx.expression())
-            var ftype = FieldType.FIELD
-            if (typeName == "onChange"){
-                ftype = FieldType.ON_CHANGE
-            }
-            val res = mutableSetOf(ModelField(
-                    ctx.variableDeclarationEntry().text,
-                    typeName,
-                    PropertyTargetVisitor.visitPropertyDeclaration(ctx),
-                    ftype))
-            return res
-        } else {
-            return emptySet()
-        }
-    }
-
-    override fun defaultResult(): Set<ModelField> {
-        return emptySet()
-    }
-
-    override fun aggregateResult(aggregate: Set<ModelField>, nextResult: Set<ModelField>): Set<ModelField> {
-        return aggregate + nextResult
-    }
-}
-
-private object PropertyTypeVisitor : KotlinParserBaseVisitor<String>() {
-
-
-
-    override fun visitAtomicExpression(ctx: KotlinParser.AtomicExpressionContext): String? {
-        return ctx.identifier().SimpleName().text
-    }
-
-    override fun defaultResult(): String {
-        return ""
-    }
-
-    override fun shouldVisitNextChild(node: RuleNode, currentResult: String): Boolean {
-        return currentResult.isBlank()
-    }
-}
-
-private object PropertyTargetVisitor : KotlinParserBaseVisitor<String>() {
+object PropertyTargetVisitor : KotlinParserBaseVisitor<String>() {
     override fun visitAtomicExpression(ctx: KotlinParser.AtomicExpressionContext): String? {
         return ctx.identifier()?.SimpleName()?.text ?: super.visitAtomicExpression(ctx)
     }

@@ -32,11 +32,11 @@ object Currency : Model<CurrencyEntity>() {
 
     val name = string("name", "Currency", maxSize = 3, required = true, help = "Currency Code (ISO 4217)")
     val symbol = string("symbol", "Symbol", maxSize = 4, help = "Currency sign, to be used when printing amounts.")
-    //    val rate = function(_get_current_rate, string="Current Rate", digits=(12,6), help="The rate of the currency to the currency of rate 1.")
+    //    val rate = function(_get_current_rate, stringColumn="Current Rate", digits=(12,6), help="The rate of the currency to the currency of rate 1.")
     val rate = decimal("rate", string = "Current Rate", precision = 12, scale = 6, help = "The rate of the currency to the currency of rate 1.")
     val rate_ids = one2many("rate_ids", "Rates") of CurrencyRate.currency_id
     val rounding = decimal("Rounding Factor", precision = 12, scale = 6)
-    //    val decimal_places = function(_decimal_places, string="Decimal Places", type="integer")
+    //    val decimal_places = function(_decimal_places, stringColumn="Decimal Places", type="integer")
     val decimal_places = integer("decimal_places", string = "Decimal Places")
     val active = boolean("active", "Active")
     val position = selection("position", CurrencyPosition, "Symbol Position", help = "Determines where the currency symbol should be placed after or before the amount.")

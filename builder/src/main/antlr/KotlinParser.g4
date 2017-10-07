@@ -455,7 +455,7 @@ postfixUnaryExpression
   ;
 
 callableReference
-  : (userType '?'*)? '::' (identifier | 'class') typeArguments?
+  : ((userType '?'*)? | 'this') '::' (identifier | 'class') typeArguments?
   ;
 
 identifier
@@ -540,8 +540,7 @@ equalityOperation
   ;
 
 assignmentOperator
-  : '='
-  | '+=' | '-=' | '*=' | '/=' | '%='
+  : '=' | '+=' | '-=' | '*=' | '/=' | '%='
   ;
 
 prefixUnaryOperation
@@ -570,7 +569,11 @@ memberAccessOperation
 
 functionLiteral
   : '{' statements '}'
-  | '{' ((modifiers SimpleName) (',' modifiers SimpleName)*)? '->' statements '}'
+  | '{' ((functionLiteralparameter) (',' functionLiteralparameter)*)? '->' statements '}'
+  ;
+
+functionLiteralparameter
+  : SimpleName (':' type)?
   ;
 
 arrayAccess

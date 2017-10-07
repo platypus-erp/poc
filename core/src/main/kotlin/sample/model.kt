@@ -18,6 +18,7 @@ import platypus.entity.PartnerTitleEntity
 //Code to write
 object PartnerTags : Model<PartnerTagsEntity>() {
     val name = newfield.string()
+    val shorcut = newfield.string()
 }
 
 data class MethodParamsTest(var s: String) : MultiMethodParams, OneMethodParams, StaticMethodParams
@@ -29,7 +30,7 @@ object Partner : Model<PartnerEntity>() {
     //Compute String Field
     val displayName = compute(newfield.string())
     val ref = computeStore(newfield.string(string = "Internal Reference"))
-    val date = newfield.date()
+    val date = newfield.
     val title = newfield.many2one("title") of PartnerTitle
     val parent = newfield.many2one("parent") of Partner
     val parentName = newfield.string("Parent name", readonly = true/*, related= arrayOf("parent", "name")*/)
@@ -49,11 +50,11 @@ object Partner : Model<PartnerEntity>() {
     }
 
 
-    val multiNoReturn = newMethod.multi(MethodParamsTest::class) { e, p, s ->
+    val multiNoReturn = newMethod.multi { e, p: MethodParamsTest, s ->
         s.Super(e, p)
     }
 
-    val multiWithReturn = newMethod.multi(MethodParamsTest::class, MethodReturnTest::class) { e, p, s ->
+    val multiWithReturn = newMethod.multi(MethodReturnTest::class) { e, p: MethodParamsTest, s ->
         s.Super(e, p) // implicit return
     }
 
@@ -80,22 +81,19 @@ object Partner : Model<PartnerEntity>() {
     val compute_set_ref = ref.setter { e, v, c -> c.Super(e, v) }
 
 
-
-
-
 }
 
 object PartnerCategorie : Model<PartnerCategorieEntity>() {
     val name = newfield.string("Category Name", required = true, translate = true)
     val color = newfield.integer("color", "Color Index")
     val parent_id = newfield.many2one("parent_id", "Parent Tag") of PartnerCategorie
-    //    complete_name = function(_name_get_fnc, type="char", string="Full Name"),
+    //    complete_name = function(_name_get_fnc, type="char", stringColumn="Full Name"),
     val complete_name = newfield.string(string = "Full Name")
     val child_ids = newfield.one2many("parent_id", "Child Tag") of PartnerCategorie.id
     val active = newfield.boolean(help = "The active choice allows you to hide the category without removing it.")
     val parent_left = newfield.integer()
     val parent_right = newfield.integer()
-//    partner_id s= many2many("res.partner", id1="category_id", id2="partner_id", string="Partners"),
+//    partner_id s= many2many("res.partner", id1="category_id", id2="partner_id", stringColumn="Partners"),
 }
 
 object PartnerTitle : Model<PartnerTitleEntity>() {

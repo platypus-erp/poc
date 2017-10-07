@@ -22,7 +22,7 @@ class PlatypusDateTimeProperty<E : PlatypusEntity>(
         private val readonly: Boolean
 ) : PlatypusProperty(string, help)
 
-class KassiopiaDateTimeColumnType(
+class PlatypusDateTimeColumnType(
         private val tableHolderName: String,
         private val fieldName: String,
         private val min: LocalDateTime,

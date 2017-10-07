@@ -10,6 +10,7 @@ import org.jetbrains.ktor.http.ContentType
 import org.jetbrains.ktor.netty.Netty
 import org.jetbrains.ktor.response.respondText
 import org.jetbrains.ktor.routing.*
+import org.platypus.core.ui.allRoot
 
 /**
  * @author chmuchme
@@ -19,6 +20,7 @@ import org.jetbrains.ktor.routing.*
 fun main(args: Array<String>) {
     val server = embeddedServer(Netty, 8080) {
         routing {
+            allRoot.values
             route("/onchange") {
                 get("{modelName}") {
 

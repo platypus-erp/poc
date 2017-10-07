@@ -32,13 +32,13 @@ object PartnerCategorie : Model<PartnerCategorieEntity>() {
     val name = string("name", "Category Name", required = true, translate = true)
     val color = integer("color", "Color Index")
     val parent_id = many2one("parent_id", "Parent Tag") of PartnerCategorie
-    //    complete_name = function(_name_get_fnc, type="char", string="Full Name"),
+    //    complete_name = function(_name_get_fnc, type="char", stringColumn="Full Name"),
     val complete_name = string("complete_name", string = "Full Name")
     val child_ids = one2many("parent_id", "Child Tag")  of PartnerCategorie.id
     val active = boolean("Active", help = "The active choice allows you to hide the category without removing it.")
     val parent_left = integer("Left parent")
     val parent_right = integer("Right parent")
-//    partner_id s= many2many("res.partner", id1="category_id", id2="partner_id", string="Partners"),
+//    partner_id s= many2many("res.partner", id1="category_id", id2="partner_id", stringColumn="Partners"),
 }
 
 object PartnerTitle : Model<PartnerTitleEntity>() {

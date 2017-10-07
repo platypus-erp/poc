@@ -16,14 +16,12 @@ interface Method
 class PlatypusMethodsFactory<ENTITY : PlatypusEntity> {
 
     fun <PARAM : MultiMethodParams, RETURN : MultiMethodReturn>
-            multi(paramType: KClass<PARAM>,
-                  returnType: KClass<RETURN>,
+            multi(returnType: KClass<RETURN>,
                   comp: (entity: Collection<ENTITY>, param: PARAM, res: MultiMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN?)
             = MultiMethodDefWithReturn(comp)
 
     fun <PARAM : MultiMethodParams>
-            multi(paramType: KClass<PARAM>,
-                  comp: (entity: Collection<ENTITY>, param: PARAM, res: MultiMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
+            multi(comp: (entity: Collection<ENTITY>, param: PARAM, res: MultiMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
             = MultiMethodDefNoReturn(comp)
 
     fun <PARAM : OneMethodParams, RETURN : OneMethodReturn>

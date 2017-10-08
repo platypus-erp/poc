@@ -30,7 +30,7 @@ object Partner : Model<PartnerEntity>() {
     //Compute String Field
     val displayName = compute(newfield.string())
     val ref = computeStore(newfield.string(string = "Internal Reference"))
-    val date = newfield.
+    val date = newfield.date()
     val title = newfield.many2one("title") of PartnerTitle
     val parent = newfield.many2one("parent") of Partner
     val parentName = newfield.string("Parent name", readonly = true/*, related= arrayOf("parent", "name")*/)

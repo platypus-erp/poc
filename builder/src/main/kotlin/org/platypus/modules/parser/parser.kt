@@ -4,12 +4,13 @@ import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.RuleContext
+import org.platypus.modules.data.ParseResult
 import org.platypus.modules.lang.kotlin.KotlinLexer
 import org.platypus.modules.lang.kotlin.KotlinParser
 import org.platypus.modules.parser.visitor.FileParser
-import org.platypus.modules.parser.visitor.ParseResult
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.FileSystems
 import java.nio.file.Files
@@ -29,18 +30,25 @@ object ParserFacade {
         return String(encoded, encoding)
     }
 
-    fun parse(path: Path): ParseResult {
-//        val path = Paths.get("/home/chmuchme/WorkSpace/KOTLIN/Kassiopeia/core/src/main/kotlin/org/platypus/modules/core/modules.kt")
+    fun getKotlinFile(path: Path):KotlinParser.KotlinFileContext{
         val code = readFile(path.toFile(), Charset.forName("UTF-8"))
         println(path)
         val lexer = KotlinLexer(ANTLRInputStream(code))
         val tokens = CommonTokenStream(lexer)
         val parser = KotlinParser(tokens)
-        val file = FileParser.visit(parser.kotlinFile())
-        println(file)
-        return file
-//        return AstPrinter.visit(parser.kotlinFile())
+        return parser.kotlinFile()
     }
+
+    fun getKotlinFileFromStream(path: InputStream):KotlinParser.KotlinFileContext{
+        val lexer = KotlinLexer(ANTLRInputStream(path))
+        val tokens = CommonTokenStream(lexer)
+        val parser = KotlinParser(tokens)
+        return parser.kotlinFile()
+    }
+
+    fun parse(path: Path): ParseResult = FileParser.visit(getKotlinFile(path))
+    fun print(path: Path) = AstPrinter.visit(getKotlinFile(path))
+
 }
 
 object ModelsFinder {

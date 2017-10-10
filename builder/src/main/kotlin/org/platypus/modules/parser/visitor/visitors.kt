@@ -1,6 +1,8 @@
 package org.platypus.modules.parser.visitor
 
 import org.antlr.v4.runtime.tree.RuleNode
+import org.platypus.modules.data.Model
+import org.platypus.modules.data.ModelField
 import org.platypus.modules.data.ParseResult
 import org.platypus.modules.lang.kotlin.KotlinParser
 import org.platypus.modules.lang.kotlin.KotlinParserBaseVisitor
@@ -29,8 +31,7 @@ val KotlinParser.PackageHeaderContext.statement: String
 enum class FieldType{
     ON_CHANGE,COMPUTE_GET,COMPUTE_SET,METHOD_MULTI,METHOD_ONE,METHOD_STATIC,FIELD
 }
-data class ModelField(val name: String, val type: String, val target: String, val ftype:FieldType = FieldType.FIELD)
-open class Model(val name: String, val fields: Set<ModelField> = mutableSetOf(), val root:Boolean = true)
+
 
 class M2MModel(modelName: String,
                fieldName: String,
@@ -96,7 +97,7 @@ object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
         val gg = ctx.supertypesSpecifiers()
         return if (gg != null && ValidatorObject.visitSupertypesSpecifiers(gg)) {
             println("Parsing ${ctx.SimpleName().text}")
-            ParseResultObject(Model(ctx.SimpleName().text, SimplePropertyVisitor.visitObjectDeclaration(ctx)), mutableSetOf())
+            ParseResultObject(Model(ctx.SimpleName().text, emptySet(), SimplePropertyVisitor.visitObjectDeclaration(ctx)), mutableSetOf())
         } else {
             null
         }

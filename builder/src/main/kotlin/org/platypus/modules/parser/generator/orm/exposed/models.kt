@@ -1,11 +1,11 @@
 package org.platypus.modules.parser.generator.orm.exposed
 
+import org.platypus.modules.data.Model
+import org.platypus.modules.data.ModelField
 import org.platypus.modules.parser.generator.M2MRegistry
 import org.platypus.modules.parser.generator.ModuleModelOrganiser
 import org.platypus.modules.parser.types
 import org.platypus.modules.parser.visitor.FieldType
-import org.platypus.modules.parser.visitor.Model
-import org.platypus.modules.parser.visitor.ModelField
 
 /**
  * @author chmuchme

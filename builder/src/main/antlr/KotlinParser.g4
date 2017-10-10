@@ -172,6 +172,7 @@ accessModifier
   | 'protected'
   | 'public'
   | 'internal'
+  | 'const'
   ;
 
 varianceAnnotation

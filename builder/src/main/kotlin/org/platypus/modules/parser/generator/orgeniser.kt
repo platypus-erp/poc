@@ -1,7 +1,7 @@
 package org.platypus.modules.parser.generator
 
+import org.platypus.modules.data.Model
 import org.platypus.modules.parser.visitor.M2MModel
-import org.platypus.modules.parser.visitor.Model
 
 /**
  * @author chmuchme

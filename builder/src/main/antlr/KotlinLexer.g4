@@ -171,6 +171,7 @@ AccessModifier_private : 'private';
 AccessModifier_protected : 'protected';
 AccessModifier_public : 'public';
 AccessModifier_internal : 'internal';
+Modifier_const : 'const';
 
 
 //VarianceAnnotation_in : 'in';

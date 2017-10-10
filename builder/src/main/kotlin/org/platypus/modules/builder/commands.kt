@@ -2,9 +2,12 @@ package org.platypus.modules.builder
 
 import org.platypus.modules.parser.generator.orm.exposed.EntityGenerator
 import org.platypus.modules.parser.ModelsFinder
+import org.platypus.modules.parser.ParserFacade
+import org.platypus.modules.parser.generator.orm.exposed.EntityGenerator.generateEntitys
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
 
 /**
@@ -27,27 +30,21 @@ val commands = mutableMapOf<String, Command>(
         Pair("generate", generateC)
 )
 
+
 fun main(args: Array<String>) {
-    with("toto"){
-        print(plus("asdasd"))
-    }
-}
-
-
-
-//fun main(args: Array<String>) {
 //    val path = Paths.get(Paths.get("").toAbsolutePath().toString(),"core")
-//    if (args.size > 0) {
-//        args[0]
-//    }
-//    val res = ParserFacade.parse(Paths.get("/home/chmuchme/WorkSpace/KOTLIN/Kassiopeia/core/src/main/kotlin/org/platypus/modules/base/users.kt"))
-////    val res = parserFacade.parse(File("examples/test.kt"))
-//    println(res)
-//    val file = generateEntitys(res.packageModel, res.models)
-//
-//    print(file)
-//    generateEntityC(path)
-//}
+    val path = Paths.get(Paths.get("").toAbsolutePath().toString(),"core", "src", "main", "kotlin", "sample")
+    if (args.size > 0) {
+        args[0]
+    }
+    val res = ModelsFinder.run(path)
+//    val res = parserFacade.parse(File("examples/test.kt"))
+    println(res)
+    val file = generateEntitys(res.packageModel, res.models, res.imports.values)
+
+    print(file)
+    generateEntityC(path)
+}
 
 object initC :Command {
     override operator fun invoke(path: Path, args: Array<String>) {

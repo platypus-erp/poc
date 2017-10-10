@@ -1,4 +1,4 @@
-package sample
+package org.platypus.modules.parser
 
 import org.platypus.core.orm.Model
 import org.platypus.core.orm.fields.PlatypusBooleanProperty
@@ -13,22 +13,8 @@ import platypus.entity.PartnerTitleEntity
 /**
  * @author chmuchme
  * @since 0.1
- * on 04/10/17.
+ * on 10/10/17.
  */
-//Code to write
-object PartnerTags : Model<PartnerTagsEntity>() {
-    val name = newfield.string()
-    val shorcut = newfield.string()
-}
-
-private const val tt:Int = 0
-
-
-
-
-data class MethodParamsTest(var s: String) : MultiMethodParams, OneMethodParams, StaticMethodParams
-data class MethodReturnTest(var s: String) : MultiMethodReturn, OneMethodReturn, StaticMethodReturn
-
 object Partner : Model<PartnerEntity>() {
     //Simple String Field
     val name = newfield.string()
@@ -86,34 +72,4 @@ object Partner : Model<PartnerEntity>() {
     val compute_set_ref = ref.setter { e, v, c -> c.Super(e, v) }
 
 
-}
-
-object PartnerCategorie : Model<PartnerCategorieEntity>() {
-    val name = newfield.string("Category Name", required = true, translate = true)
-    val color = newfield.integer("color", "Color Index")
-    val parent_id = newfield.many2one("parent_id", "Parent Tag") of PartnerCategorie
-    //    complete_name = function(_name_get_fnc, type="char", stringColumn="Full Name"),
-    val complete_name = newfield.string(string = "Full Name")
-    val child_ids = newfield.one2many("parent_id", "Child Tag") of PartnerCategorie.id
-    val active = newfield.boolean(help = "The active choice allows you to hide the category without removing it.")
-    val parent_left = newfield.integer()
-    val parent_right = newfield.integer()
-//    partner_id s= many2many("res.partner", id1="category_id", id2="partner_id", stringColumn="Partners"),
-}
-
-object PartnerTitle : Model<PartnerTitleEntity>() {
-    val name = newfield.string("name")
-    val sortcut = newfield.string("sortcut")
-
-}
-
-val PartnerTitle.toto: PlatypusBooleanProperty<PartnerTitleEntity>
-    get() = PartnerTitleExtend.toto
-
-object PartnerTitleExtend : Model<PartnerTitleEntity>() {
-    init {
-        PartnerTitle.name
-    }
-
-    val toto = newfield.boolean()
 }

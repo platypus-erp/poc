@@ -1,11 +1,11 @@
 package org.platypus.modules.parser.generator.orm.exposed
 
+import org.platypus.modules.data.Model
+import org.platypus.modules.data.ModelField
 import org.platypus.modules.parser.generator.M2MRegistry
 import org.platypus.modules.parser.generator.ModuleModelOrganiser
 import org.platypus.modules.parser.types
 import org.platypus.modules.parser.visitor.FieldType
-import org.platypus.modules.parser.visitor.Model
-import org.platypus.modules.parser.visitor.ModelField
 
 /**
  * @author chmuchme
@@ -44,14 +44,14 @@ infix fun <T : Any> String.pair(s: T): Pair<String, T> {
 
 object EntityGenerator {
 
-    fun generateEntitys(packageModel: String, m: Set<Model>, im: MutableCollection<String>): String {
+    fun generateEntitys(packageModel: String, m: Set<Model>, imports: MutableCollection<String>): String {
         val org = ModuleModelOrganiser(m)
         org.resolveM2M()
 
         var file = "package $packageModel\n"
         file += importbase
-        im.forEach {
-            file += "import $it\n"
+        imports.forEach {
+            file += "imports $it\n"
         }
         file += M2MRegistry.generateM2M()
         file += template

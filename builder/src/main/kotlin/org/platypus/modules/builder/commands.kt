@@ -42,8 +42,8 @@ fun main(args: Array<String>) {
     println(res)
     val file = generateEntitys(res.packageModel, res.models, res.imports.values)
 
-    print(file)
-    generateEntityC(path)
+//    print(file)
+//    generateEntityC(path)
 }
 
 object initC :Command {

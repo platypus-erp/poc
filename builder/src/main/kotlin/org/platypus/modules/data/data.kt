@@ -11,7 +11,10 @@ enum class SimplePropertyType {
     STRING, BOOLEAN, DATE, DATETIME, TIME, FLOAT, INTEGER, DECIMAL, TEXT, BINARY, MANY2ONE, MANY2MANY, ONE2MANY, SELECTION, NONE
 }
 enum class FieldTypeCompute {
-    NEWFIELD,COMPUTE,COMUPTESTORE
+    NEWFIELD,COMPUTE, COMPUTESTORE
+}
+enum class MethodType {
+    ONE,MULTI, STATIC
 }
 data class ParseResult(var packageModel: String = "",
                        val models: MutableSet<Model> = mutableSetOf(),
@@ -19,7 +22,7 @@ data class ParseResult(var packageModel: String = "",
                        val errors: MutableSet<String> = mutableSetOf())
 
 
-data class RootModel(val name: String, val properties: Set<ModelSimpleProperty>)
-data class ModelSimpleProperty(val name: String, val readonly: Boolean, val compute: FieldTypeCompute, val type: SimplePropertyType)
-data class ModelField(val name: String, val type: String, val target: String, val ftype: FieldType = FieldType.FIELD)
-open class Model(val name: String, val fields: Set<ModelField> = mutableSetOf(), val simpleField: Set<ModelSimpleProperty> = mutableSetOf(), val root:Boolean = true)
+data class RootModel(val name: String, val properties: Set<ModelProperty>)
+data class ModelProperty(val name: String, val readonly: Boolean, val compute: FieldTypeCompute, val type: SimplePropertyType, val target:Pair<String,String>? = null)
+data class ModelMethod(val name: String, val type: MethodType, val param: String)
+open class Model(val name: String, val fields: Set<ModelMethod> = mutableSetOf(), val simpleField: Set<ModelProperty> = mutableSetOf(), val root:Boolean = true)

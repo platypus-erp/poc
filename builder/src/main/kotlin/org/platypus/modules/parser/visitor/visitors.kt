@@ -90,14 +90,20 @@ object FileParser : KotlinParserBaseVisitor<ParseResult>() {
 
     }
 }
+object GetAtomicExpressionName : KotlinParserBaseVisitor<String>() {
+    override fun visitAtomicExpression(ctx: KotlinParser.AtomicExpressionContext) = ctx.identifier().SimpleName().text
+    override fun defaultResult() = ""
+    override fun shouldVisitNextChild(node: RuleNode, currentResult: String) = currentResult.isBlank()
 
+
+}
 object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
 
     override fun visitObjectDeclaration(ctx: KotlinParser.ObjectDeclarationContext): ParseResultObject? {
         val gg = ctx.supertypesSpecifiers()
         return if (gg != null && ValidatorObject.visitSupertypesSpecifiers(gg)) {
             println("Parsing ${ctx.SimpleName().text}")
-            ParseResultObject(Model(ctx.SimpleName().text, emptySet(), SimplePropertyVisitor.visitObjectDeclaration(ctx)), mutableSetOf())
+            ParseResultObject(Model(ctx.SimpleName().text, emptySet(), MethodVisitor.visitObjectDeclaration(ctx)), mutableSetOf())
         } else {
             null
         }

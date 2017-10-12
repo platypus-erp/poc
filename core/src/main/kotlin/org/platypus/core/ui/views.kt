@@ -4,6 +4,8 @@ import org.platypus.modules.base.Users
 import org.platypus.core.orm.AbstractPlatypusModel
 import org.platypus.core.orm.PlatypusEntity
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.ktor.util.nonceRandom
+import java.util.*
 
 /**
  * @author chmuchme
@@ -11,13 +13,12 @@ import org.jetbrains.exposed.sql.Column
  * on 07/09/17.
  */
 class ViewModelRegistry<E : PlatypusEntity>(val model: AbstractPlatypusModel<E>) {
-    val views:MutableMap<ViewType, MutableMap<String, ViewNode>> = mutableMapOf()
+    val views: MutableMap<ViewType, MutableMap<String, ViewNode>> = mutableMapOf()
 
     operator fun get(viewType: ViewType, id: String): ViewNode? {
         return views[viewType]?.get(id)
     }
 }
-
 
 
 class FormViewModelRegistry {
@@ -35,7 +36,7 @@ fun form(id: String, init: Form.() -> Unit): Form {
     return form
 }
 
-abstract class ViewNode(val name: String) {
+abstract class ViewNode(val name: String, val id: String = name + Random().nextInt()) {
     protected val children: MutableList<ViewNode> = mutableListOf()
     var groups: Array<String> = arrayOf()
 
@@ -52,7 +53,8 @@ abstract class ViewNode(val name: String) {
     }
 }
 
-class Form(val id: String) : ViewNode("form"), ViewType {
+class Form(id: String) : ViewNode("form"), ViewType {
+
     fun group(init: Group.() -> Unit) = initTag(Group(), init)
 }
 
@@ -66,13 +68,13 @@ class Group : ViewNode("group") {
     fun field(col: Column<*>, init: Field.() -> Unit) = initTag(Field(col), init)
 }
 
-class Field(col: Column<*>) : ViewNode("choice") {
+class Field(col: Column<*>) : ViewNode("field") {
     var label: String = col.name
 }
 
+
 val myForm = form("myForm") {
     group {
-        cssClass = arrayOf("myCss")
         invisible = true
         group {
             field(Users.login) {

@@ -2,11 +2,10 @@ package org.platypus.modules.parser.visitor
 
 import org.antlr.v4.runtime.tree.RuleNode
 import org.platypus.modules.data.Model
-import org.platypus.modules.data.ModelField
 import org.platypus.modules.data.ParseResult
+import org.platypus.modules.data.ParseResultObject
 import org.platypus.modules.lang.kotlin.KotlinParser
 import org.platypus.modules.lang.kotlin.KotlinParserBaseVisitor
-import org.platypus.modules.parser.generator.orm.exposed.firstLetterUpper
 
 /**
  * @author chmuchme
@@ -27,28 +26,6 @@ val KotlinParser.PackageHeaderContext.statement: String
     get() = this.identifier().joinToString(".") {
         it.SimpleName().text
     }
-
-enum class FieldType{
-    ON_CHANGE,COMPUTE_GET,COMPUTE_SET,METHOD_MULTI,METHOD_ONE,METHOD_STATIC,FIELD
-}
-
-
-class M2MModel(modelName: String,
-               fieldName: String,
-               targetModelName: String,
-               targetFieldName: String) :
-        Model(modelName.firstLetterUpper() +
-                fieldName.firstLetterUpper() +
-                targetModelName.firstLetterUpper() +
-                "${targetFieldName.firstLetterUpper()}Rel",
-                setOf(ModelField(fieldName,"",targetModelName),
-                        ModelField(targetFieldName,"",modelName))
-        ){
-    val field1 = super.fields.first()
-    val field2 = super.fields.last()
-}
-
-data class ParseResultObject(val model: Model, val errors: MutableSet<String>)
 
 object FileParser : KotlinParserBaseVisitor<ParseResult>() {
 
@@ -80,7 +57,7 @@ object FileParser : KotlinParserBaseVisitor<ParseResult>() {
             nextResult.errors += aggregate.errors
             nextResult.models += aggregate.models
             nextResult.imports += aggregate.imports
-            if (nextResult.packageModel.isBlank()){
+            if (nextResult.packageModel.isBlank()) {
                 nextResult.packageModel = aggregate.packageModel
             }
             nextResult
@@ -90,6 +67,7 @@ object FileParser : KotlinParserBaseVisitor<ParseResult>() {
 
     }
 }
+
 object GetAtomicExpressionName : KotlinParserBaseVisitor<String>() {
     override fun visitAtomicExpression(ctx: KotlinParser.AtomicExpressionContext) = ctx.identifier().SimpleName().text
     override fun defaultResult() = ""
@@ -97,13 +75,21 @@ object GetAtomicExpressionName : KotlinParserBaseVisitor<String>() {
 
 
 }
+
 object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
 
     override fun visitObjectDeclaration(ctx: KotlinParser.ObjectDeclarationContext): ParseResultObject? {
         val gg = ctx.supertypesSpecifiers()
         return if (gg != null && ValidatorObject.visitSupertypesSpecifiers(gg)) {
             println("Parsing ${ctx.SimpleName().text}")
-            ParseResultObject(Model(ctx.SimpleName().text, emptySet(), MethodVisitor.visitObjectDeclaration(ctx)), mutableSetOf())
+            ParseResultObject(
+                    Model(
+                            ctx.SimpleName().text,
+                            MethodVisitor.visitObjectDeclaration(ctx),
+                            PropertyVisitor.visitObjectDeclaration(ctx),
+                            true
+                    ),
+                    mutableSetOf())
         } else {
             null
         }
@@ -148,7 +134,7 @@ object PropertyTargetVisitor : KotlinParserBaseVisitor<String>() {
 
     override fun visitInfixFunctionCall(ctx: KotlinParser.InfixFunctionCallContext): String? {
         var target = if (ctx.SimpleName().isNotEmpty()) ctx.SimpleName()[0].text else "no_target"
-        if (target == "of"){
+        if (target == "of") {
             target = ctx.rangeExpression().last()
                     .additiveExpression().first()
                     .multiplicativeExpression().first()
@@ -163,7 +149,7 @@ object PropertyTargetVisitor : KotlinParserBaseVisitor<String>() {
                     .postfixUnaryExpression()
                     .postfixUnaryOperation().firstOrNull()
                     ?.postfixUnaryExpression()?.atomicExpression()?.identifier()?.SimpleName()?.text ?: "no_col"
-            if (col != "no_col"){
+            if (col != "no_col") {
                 target += ".$col"
             }
         }

@@ -62,7 +62,7 @@ object EntityGenerator {
     }
 
     private fun generateEntity(m: Model): String {
-        val fieldToJson = m.fields
+        val fieldToJson = m.method
                 .filter { it.ftype == FieldType.FIELD }
                 .joinToString(separator = ",\n                ") {
                     when (it.type) {
@@ -112,7 +112,7 @@ class ${m.name}Entity(id: EntityID<Int>,val ctx: AppCtx) : KassiopiaGeneratedEnt
             )
         )
     }"""
-        for (f in m.fields) {
+        for (f in m.method) {
             templateClass += "\n    " + when (f.ftype) {
                 FieldType.FIELD -> generateField(m.name, f)
                 FieldType.ON_CHANGE -> generateOnChange(m.name, f)

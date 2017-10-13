@@ -63,19 +63,19 @@ object Partner : Model<PartnerEntity>() {
         s.Super(e, p) // implicit return
     }
 
-    val oneNoReturn = newMethod.one(MethodParamsTest::class) { e, p, s ->
+    val oneNoReturn = newMethod.one { e, p:MethodParamsTest, s ->
         s.Super(e, p)
     }
 
-    val oneWithReturn = newMethod.one(MethodParamsTest::class, MethodReturnTest::class) { e, p, s ->
+    val oneWithReturn = newMethod.one(MethodReturnTest::class) { e, p:MethodParamsTest, s ->
         s.Super(e, p) // implicit return
     }
 
-    val staticNoReturn = newMethod.static(MethodParamsTest::class) { p, s ->
+    val staticNoReturn = newMethod.static { p:MethodParamsTest, s ->
         s.Super(p)
     }
 
-    val staticWithReturn = newMethod.static(MethodParamsTest::class, MethodReturnTest::class) { p, s ->
+    val staticWithReturn = newMethod.static(MethodReturnTest::class) { p:MethodParamsTest, s ->
         s.Super(p) // implicit return
     }
 

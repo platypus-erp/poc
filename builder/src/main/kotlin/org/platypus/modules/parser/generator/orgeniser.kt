@@ -1,7 +1,8 @@
 package org.platypus.modules.parser.generator
 
+import org.platypus.modules.data.M2MModel
 import org.platypus.modules.data.Model
-import org.platypus.modules.parser.visitor.M2MModel
+import org.platypus.modules.data.SimplePropertyType
 
 /**
  * @author chmuchme
@@ -16,12 +17,12 @@ class ModuleModelOrganiser(models: Set<Model>) {
     fun resolveM2M() {
         val m2mModel = mutableSetOf<Model>()
         for (m in rootModels) {
-            for ((name, type, target) in m.fields) {
-                if (type == "many2many") {
-                    val targetReplace = target.replace("this", m.name)
+            for (f in m.simpleField) {
+                if (f.type == SimplePropertyType.MANY2MANY) {
+                    val targetReplace = f.target!!.first.replace("this", m.name)
                     val targetWithoutCol = targetReplace.split(".")[0]
                     val col = targetReplace.split(".")[1]
-                    M2MRegistry.getElement(m.name, name, targetWithoutCol, col)
+                    M2MRegistry.getElement(m.name, f.name, targetWithoutCol, col)
                 }
             }
         }

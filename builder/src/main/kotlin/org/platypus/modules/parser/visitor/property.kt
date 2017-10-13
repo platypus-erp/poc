@@ -61,8 +61,8 @@ object SimplePropertyVisitor : KotlinParserBaseVisitor<NewSimpleFieldAntlr>() {
     override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): NewSimpleFieldAntlr? {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
         if (mName == "newfield") {
-            val type = GetNewMethodType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
-            return NewSimpleFieldAntlr(false, FieldTypeCompute.NEWFIELD, type)
+            val type = SimplePropertyVisitor.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
+            return NewSimpleFieldAntlr(false, FieldTypeCompute.NEWFIELD, type.type)
         }
         if (mName == "compute") {
             val type = SimplePropertyVisitor.visitCallSuffix(ctx.callSuffix())

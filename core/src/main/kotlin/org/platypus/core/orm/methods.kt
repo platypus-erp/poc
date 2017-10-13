@@ -25,26 +25,23 @@ class PlatypusMethodsFactory<ENTITY : PlatypusEntity> {
             = MultiMethodDefNoReturn(comp)
 
     fun <PARAM : OneMethodParams, RETURN : OneMethodReturn>
-            one(paramType: KClass<PARAM>,
-                returnType: KClass<RETURN>,
+            one(returnType: KClass<RETURN>,
                 comp: (entity: ENTITY, param: PARAM, res: OneMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN?)
             = OneMethodDefWithReturn(comp)
 
     fun <PARAM : OneMethodParams>
-            one(paramType: KClass<PARAM>, comp: (entity: ENTITY, param: PARAM, res: OneMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
+            one(comp: (entity: ENTITY, param: PARAM, res: OneMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
             = OneMethodDefNoReturn(comp)
 
     @JvmName("model")
     fun <PARAM : StaticMethodParams, RETURN : StaticMethodReturn>
-            static(paramType: KClass<PARAM>,
-                returnType: KClass<RETURN>,
+            static(returnType: KClass<RETURN>,
                 comp: (param: PARAM, res: StaticMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN?)
             = StaticMethodDefWithReturn(comp)
 
     @JvmName("model")
     fun <PARAM : StaticMethodParams>
-            static(paramType: KClass<PARAM>,
-                   comp: (param: PARAM, res: StaticMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
+            static(comp: (param: PARAM, res: StaticMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
             = StaticMethodDefNoReturn(comp)
 
     fun group(vararg props: PlatypusProperty) = OnChangeGroup<ENTITY>(props)

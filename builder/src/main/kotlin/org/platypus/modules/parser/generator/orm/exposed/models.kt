@@ -1,7 +1,6 @@
 package org.platypus.modules.parser.generator.orm.exposed
 
 import org.platypus.modules.data.Model
-import org.platypus.modules.data.ModelField
 import org.platypus.modules.parser.generator.M2MRegistry
 import org.platypus.modules.parser.generator.ModuleModelOrganiser
 import org.platypus.modules.parser.types
@@ -38,7 +37,7 @@ var templateModel = """
 sealed class KassiopiaGeneratedEntity(id: EntityID<Int>) : KassiopiaEntity(id)
 """
 
-object ModelGenerator {
+object TableGenerator {
 
     fun generateEntitys(packageModel: String, m: Set<Model>, im: MutableCollection<String>): String {
         val org = ModuleModelOrganiser(m)
@@ -52,13 +51,13 @@ object ModelGenerator {
         file += M2MRegistry.generateM2M()
         file += templateModel
         m.forEach {
-            file += ModelGenerator.generateModel(it)
+            file += TableGenerator.generateModel(it)
         }
         return file
     }
 
     private fun generateModel(m: Model): String {
-        val fieldToJson = m.fields
+        val fieldToJson = m.method
                 .filter { it.ftype == FieldType.FIELD }
                 .joinToString(separator = ",\n                ") {
                     when (it.type) {
@@ -108,7 +107,7 @@ class ${m.name}Entity(id: EntityID<Int>,val ctx: AppCtx) : KassiopiaGeneratedEnt
             )
         )
     }"""
-        for (f in m.fields) {
+        for (f in m.method) {
             templateClass += "\n    " + when (f.ftype) {
                 FieldType.FIELD -> generateField(m.name, f)
                 FieldType.ON_CHANGE -> generateOnChange(m.name, f)

@@ -61,11 +61,17 @@ open class InheritModel<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 }
 
-open class Many2ManyModel(tableName: String = "") {
+open class Many2ManyTable(tableName: String = "") {
     val table = PlatypusTable(tableName)
 
     protected fun ref(name: String, target: PlatypusTable, refOpt: ReferenceOption? = null): Column<EntityID<Long>> =
             table.reference(name, target, refOpt)
+
+}
+
+open class Many2ManyModel(tableName: String = "") {
+
+    protected fun ref(target: AbstractPlatypusModel<*>, refOpt: ReferenceOption? = null) = PlatypusM2MColumn(target, refOpt)
 
 }
 

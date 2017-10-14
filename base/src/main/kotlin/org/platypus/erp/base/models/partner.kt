@@ -1,5 +1,6 @@
-package sample
+package org.platypus.erp.base.models
 
+import org.platypus.core.orm.Many2ManyModel
 import org.platypus.core.orm.Model
 import org.platypus.core.orm.fields.PlatypusBooleanProperty
 import org.platypus.core.orm.methods.*
@@ -9,6 +10,7 @@ import platypus.entity.PartnerCategorieEntity
 import platypus.entity.PartnerEntity
 import platypus.entity.PartnerTagsEntity
 import platypus.entity.PartnerTitleEntity
+import sample.PartnerTitleExtend
 
 /**
  * @author chmuchme
@@ -23,11 +25,13 @@ object PartnerTags : Model<PartnerTagsEntity>() {
 
 private const val tt:Int = 0
 
-
-
-
 data class MethodParamsTest(var s: String) : MultiMethodParams, OneMethodParams, StaticMethodParams
 data class MethodReturnTest(var s: String) : MultiMethodReturn, OneMethodReturn, StaticMethodReturn
+
+object PartnerTargsRel : Many2ManyModel(){
+    val partner = ref(Partner)
+    val tags = ref(PartnerTags)
+}
 
 object Partner : Model<PartnerEntity>() {
     //Simple String Field
@@ -42,8 +46,6 @@ object Partner : Model<PartnerEntity>() {
     val email = newfield.string("Email", maxSize = 64, required = true)
     val childIds = newfield.one2many("childIds") of Partner.id
     val lang = newfield.many2one("Language") of ResLang
-
-    val m2m = newfield.many2many() of PartnerTags
 
 
     val onChangeName = name.onChange { e, ctx ->
@@ -65,19 +67,19 @@ object Partner : Model<PartnerEntity>() {
         s.Super(e, p) // implicit return
     }
 
-    val oneNoReturn = newMethod.one { e, p:MethodParamsTest, s ->
+    val oneNoReturn = newMethod.one { e, p: MethodParamsTest, s ->
         s.Super(e, p)
     }
 
-    val oneWithReturn = newMethod.one(MethodReturnTest::class) { e, p:MethodParamsTest, s ->
+    val oneWithReturn = newMethod.one(MethodReturnTest::class) { e, p: MethodParamsTest, s ->
         s.Super(e, p) // implicit return
     }
 
-    val staticNoReturn = newMethod.static { p:MethodParamsTest, s ->
+    val staticNoReturn = newMethod.static { p: MethodParamsTest, s ->
         s.Super(p)
     }
 
-    val staticWithReturn = newMethod.static(MethodReturnTest::class) { p:MethodParamsTest, s ->
+    val staticWithReturn = newMethod.static(MethodReturnTest::class) { p: MethodParamsTest, s ->
         s.Super(p) // implicit return
     }
 
@@ -114,7 +116,7 @@ val PartnerTitle.toto: PlatypusBooleanProperty<PartnerTitleEntity>
 
 object PartnerTitleExtend : Model<PartnerTitleEntity>() {
     init {
-        PartnerTitle.name
+        sample.PartnerTitle.name
     }
 
     val toto = newfield.boolean()

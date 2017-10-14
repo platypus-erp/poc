@@ -1,9 +1,9 @@
-package org.platypus.modules.parser.generator.orm.exposed
+package org.platypus.modules.generator.orm
 
 import org.platypus.modules.data.Model
 import org.platypus.modules.data.ModelField
-import org.platypus.modules.parser.generator.M2MRegistry
-import org.platypus.modules.parser.generator.ModuleModelOrganiser
+import org.platypus.modules.generator.M2MRegistry
+import org.platypus.modules.generator.ModuleModelOrganiser
 import org.platypus.modules.parser.types
 import org.platypus.modules.parser.visitor.FieldType
 
@@ -49,14 +49,14 @@ object EntityGenerator {
         org.resolveM2M()
 
         var file = "package $packageModel\n"
-        file += importbase
+        file += org.platypus.modules.parser.generator.orm.importbase
         imports.forEach {
             file += "imports $it\n"
         }
         file += M2MRegistry.generateM2M()
-        file += template
+        file += org.platypus.modules.parser.generator.orm.template
         m.forEach {
-            file += EntityGenerator.generateEntity(it)
+            file += org.platypus.modules.parser.generator.orm.EntityGenerator.generateEntity(it)
         }
         return file
     }

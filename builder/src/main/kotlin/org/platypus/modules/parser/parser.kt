@@ -51,7 +51,7 @@ object ParserFacade {
 
 }
 
-object ModelsFinder {
+object ModelsParser {
     fun run(modelDir: Path): ParseResult {
         val kotlinMatcher = FileSystems.getDefault().getPathMatcher("glob:**.kt")
         val result: Set<ParseResult> = Stream.of(modelDir)

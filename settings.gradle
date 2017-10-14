@@ -1,4 +1,6 @@
 rootProject.name = 'platypus'
 include 'core'
 include 'builder'
+include 'base'
+include 'kotlin-writer'
 

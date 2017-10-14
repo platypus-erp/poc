@@ -50,8 +50,9 @@ clean{
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    compile group: 'com.squareup', name: 'kotlinpoet', version: '0.4.0'
     compile 'org.jetbrains.exposed:exposed:0.8.2'
+    compile project(':kotlin-writer')
+    compile project(':core')
     testCompile 'junit:junit:4.12'
 }
 

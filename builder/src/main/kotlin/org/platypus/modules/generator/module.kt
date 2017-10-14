@@ -1,4 +1,4 @@
-package org.platypus.modules.parser.generator
+package org.platypus.modules.generator
 
 /**
  * @author chmuchme

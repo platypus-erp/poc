@@ -1,4 +1,4 @@
-package org.platypus.modules.parser.generator
+package org.platypus.modules.generator
 
 import org.platypus.modules.data.M2MModel
 import org.platypus.modules.data.Model

@@ -1,9 +1,7 @@
 package org.platypus.modules.builder
 
-import org.platypus.modules.parser.generator.orm.exposed.EntityGenerator
-import org.platypus.modules.parser.ModelsFinder
-import org.platypus.modules.parser.ParserFacade
-import org.platypus.modules.parser.generator.orm.exposed.EntityGenerator.generateEntitys
+import org.platypus.modules.parser.ModelsParser
+import org.platypus.modules.generator.orm.EntityGenerator
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -15,108 +13,80 @@ import java.nio.file.Paths
  * @since 0.1
  * on 01/09/17.
  */
-val incremetalFile = "incr.kasiop"
+fun launch(mainArgs: Array<String>) {
+    val param = mainArgs.map {
+        val sr = it.split("=")
+        Pair(sr[0], sr[1])
+    }.toMap()
 
-interface Command {
+    val group = param["--group"]!!
+    val artifactId = param["--artifactId"]!!
+    val modelsPath = param["--models"] ?: "models"
 
-    operator fun  invoke(path: Path, args: Array<String> = emptyArray())
-}
-
-val commands = mutableMapOf<String, Command>(
-        Pair("help", helpC),
-        Pair("full", fullC),
-        Pair("generateEntity", generateEntityC),
-        Pair("init", initC),
-        Pair("generate", generateC)
-)
-
-
-fun main(args: Array<String>) {
-//    val path = Paths.get(Paths.get("").toAbsolutePath().toString(),"core")
-    val path = Paths.get(Paths.get("").toAbsolutePath().toString(),"core", "src", "main", "kotlin", "sample")
-    if (args.size > 0) {
-        args[0]
+    val modulePath = Paths.get("").toAbsolutePath().resolve(artifactId)
+    assert(Files.exists(modulePath)) {
+        "The module don't exist. path=$modulePath"
     }
-    val res = ModelsFinder.run(path)
-//    val res = parserFacade.parse(File("examples/test.kt"))
-    println(res)
-    val file = generateEntitys(res.packageModel, res.models, res.imports.values)
-
-//    print(file)
-//    generateEntityC(path)
-}
-
-object initC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
-
-
+    val pathSrc = getMainPath(artifactId, group)
+    assert(Files.exists(modulePath)) {
+        "The module src don't exist. path=$pathSrc"
+    }
+    val viewsPath = pathSrc.resolve(param["--views"] ?: "views")
+    assert(Files.exists(viewsPath)) {
+        "The module src don't exist. path=$pathSrc"
+    }
+    val datasPath = pathSrc.resolve(param["--datas"] ?: "datas")
+    assert(Files.exists(datasPath)) {
+        "The module src don't exist. path=$pathSrc"
+    }
+    val securityPath = pathSrc.resolve(param["--security"] ?: "security")
+    assert(Files.exists(securityPath)) {
+        "The module src don't exist. path=$pathSrc"
+    }
+    val pathGenerate = modulePath.resolve(param["--gen"] ?: "build/generated-src")
+    assert(Files.exists(pathGenerate)) {
+        "The module src don't exist. path=$pathSrc"
     }
 
-}
 
-object helpC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
 
-    }
+    val res = ModelsParser.run(pathSrc.resolve(modelsPath))
 
-}
-object fullC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
-        cleanC(path, args)
-        importsC(path, args)
-        generateC(path, args)
-    }
 
-}
-object generateC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
-
-    }
-
-}
-object generateEntityC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
-        if(!Files.exists(path.resolve("modules"))){
-            Files.createDirectory(path.resolve("modules"))
-            Files.createFile(path.resolve("modules").resolve(incremetalFile))
+    if (res.errors.isNotEmpty()) {
+        println("-------------Errors detected inside your code-------------")
+        res.errors.forEach {
+            println(it)
         }
-        val models = ModelsFinder.run(path.resolve("src").resolve("main").resolve("kotlin").resolve("org")
-                .resolve("platypus").resolve("modules").resolve("base"))
-        if (models.errors.isNotEmpty()){
-            println("-------------Errors detected inside your code-------------")
-            models.errors.forEach {
-                println(it)
-            }
-            return
-        }
-        cleanC(path, args)
-        val pathEntitySrc = path
-                .resolve("src")
-                .resolve("main")
-                .resolve("kotlin")
-                .resolve("modules")
-                .resolve("entity")
-        Files.deleteIfExists(pathEntitySrc.resolve("entity.kt"))
-        val file = Files.createFile(pathEntitySrc.resolve("entity.kt"))
-        Files.write(file, EntityGenerator.generateEntitys("modules.entity", models.models, models.imports.values)
-                .toByteArray(Charset.forName("UTF-8")))
-
+        return
     }
 
+
+    val pathEntitySrc = pathGenerate.resolve(group.replace(".","/")).resolve("entity")
+    val pathTablesSrc = pathGenerate.resolve(group.replace(".","/")).resolve("tables")
+    val bigFile = EntityGenerator.generateEntitys("modules.entity", res.models, res.imports.values)
+
+
+
+    Files.deleteIfExists(pathEntitySrc.resolve("entity.kt"))
+    val file = Files.createFile(pathEntitySrc.resolve("entity.kt"))
+    Files.write(file, bigFile.toByteArray(Charset.forName("UTF-8")))
 }
 
-object generateKassiopiaJsonC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
+private fun getMainPath(artifactId: String, group: String): Path {
+    var path = Paths.get("").toAbsolutePath()
+            .resolve(artifactId)
+            .resolve("src").resolve("main").resolve("kotlin")
+    for (g in group.split("\\.")) {
+        path = path.resolve(g)
     }
-
+    return path.resolve(artifactId)
 }
-object importsC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
-    }
 
-}
-object cleanC :Command {
-    override operator fun invoke(path: Path, args: Array<String>) {
+object GenerateEntityAndTable{
+    fun run(pathGenerate:String, artifactId: String, group: String,path: Path) {
+
+
     }
 
 }

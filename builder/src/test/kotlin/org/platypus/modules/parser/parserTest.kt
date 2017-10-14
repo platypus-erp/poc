@@ -1,10 +1,5 @@
 package org.platypus.modules.parser
 
-import org.platypus.modules.builder.generateEntityC
-import org.platypus.modules.parser.generator.orm.exposed.EntityGenerator
-import java.io.File
-import java.nio.file.Paths
-
 /**
  * @author chmuchme
  * @since 0.1

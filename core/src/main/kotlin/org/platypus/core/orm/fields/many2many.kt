@@ -1,5 +1,6 @@
 package org.platypus.core.orm.fields
 
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.platypus.core.orm.AbstractPlatypusModel
 
 /**
@@ -7,6 +8,4 @@ import org.platypus.core.orm.AbstractPlatypusModel
  * @since 0.1
  * on 06/10/17.
  */
-class KassiopiaM2MColumnTmp(private val model: AbstractPlatypusModel<*>, private val name: String) {
-    infix fun of(target: M2MColumn): M2MColumn = M2MColumn(this.model, this.name, target)
-}
+class PlatypusM2MColumn(private val model: AbstractPlatypusModel<*>, private val refOpt: ReferenceOption? = null)

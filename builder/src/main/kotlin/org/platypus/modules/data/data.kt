@@ -1,7 +1,5 @@
 package org.platypus.modules.data
 
-import org.platypus.modules.parser.generator.orm.exposed.firstLetterUpper
-
 /**
  * @author chmuchme
  * @since 0.1
@@ -41,10 +39,12 @@ data class ModelMethod(val name: String,
                        val paramType: String,
                        val returnType: String)
 
-open class Model(val name: String,
-                 val method: Set<ModelMethod> = mutableSetOf(),
-                 val simpleField: Set<ModelProperty> = mutableSetOf(),
-                 val root: Boolean = true)
+open class Model(
+        val pkg: String,
+        val name: String,
+        val method: Set<ModelMethod> = mutableSetOf(),
+        val simpleField: Set<ModelProperty> = mutableSetOf(),
+        val root: Boolean = true)
 
 class M2MModel(modelName: String,
                fieldName: String,

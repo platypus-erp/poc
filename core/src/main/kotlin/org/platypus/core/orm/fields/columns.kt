@@ -151,9 +151,9 @@ class PlatypusPropertyFactory<E : PlatypusEntity>(private val model:AbstractPlat
     fun one2many(string: String? = null,
                  help: String? = null) = KassiopiaO2MColumnTmp(model, "")
 
-    fun many2many(string: String? = null,
-                  help: String? = null) = KassiopiaM2MColumnTmp(model, "")
-
+//    fun many2many(string: String? = null,
+//                  help: String? = null) = PlatypusM2MColumn(model, "")
+//
     fun many2one(string: String? = null,
                  help: String? = null,
                  required: Boolean? = null,

@@ -1,5 +1,7 @@
 package org.platypus.modules.data
 
+import org.platypus.modules.firstUpper
+
 /**
  * @author chmuchme
  * @since 0.1
@@ -14,7 +16,7 @@ enum class FieldTypeCompute {
 }
 
 enum class MethodType {
-    ONE, MULTI, STATIC, NONE
+    ONE, MULTI, STATIC, NONE, GROUP
 }
 
 data class ParseResult(var packageModel: String = "",
@@ -30,6 +32,7 @@ data class RootModel(val name: String,
 
 data class ModelProperty(val name: String,
                          val readonly: Boolean,
+                         val required: Boolean,
                          val compute: FieldTypeCompute,
                          val type: SimplePropertyType,
                          val target: Pair<String, String>? = null)
@@ -37,7 +40,7 @@ data class ModelProperty(val name: String,
 data class ModelMethod(val name: String,
                        val type: MethodType,
                        val paramType: String,
-                       val returnType: String)
+                       val returnType: String?)
 
 open class Model(
         val pkg: String,
@@ -50,11 +53,11 @@ class M2MModel(modelName: String,
                fieldName: String,
                targetModelName: String,
                targetFieldName: String) :
-        Model(modelName.firstLetterUpper() + fieldName.firstLetterUpper() + targetModelName.firstLetterUpper() + "${targetFieldName.firstLetterUpper()}Rel",
-                emptySet(),
-                setOf(
-                        ModelProperty(fieldName, false, FieldTypeCompute.NEWFIELD, SimplePropertyType.MANY2ONE, Pair(targetModelName, "")),
-                        ModelProperty(targetFieldName, false, FieldTypeCompute.NEWFIELD, SimplePropertyType.MANY2ONE, Pair(modelName, ""))
+        Model("",
+                modelName.firstUpper() + fieldName.firstUpper() + targetModelName.firstUpper() + "${targetFieldName.firstUpper()}Rel",
+                simpleField = setOf(
+                        ModelProperty(fieldName, false,false, FieldTypeCompute.NEWFIELD, SimplePropertyType.MANY2ONE, Pair(targetModelName, "")),
+                        ModelProperty(targetFieldName, false,false, FieldTypeCompute.NEWFIELD, SimplePropertyType.MANY2ONE, Pair(modelName, ""))
                 )
         ) {
     val field1 = super.simpleField.first()

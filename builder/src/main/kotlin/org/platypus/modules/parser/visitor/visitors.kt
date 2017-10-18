@@ -83,7 +83,7 @@ object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
         return if (gg != null && ValidatorObject.visitSupertypesSpecifiers(gg)) {
             println("Parsing ${ctx.SimpleName().text}")
             ParseResultObject(
-                    Model(
+                    Model("",
                             ctx.SimpleName().text,
                             MethodVisitor.visitObjectDeclaration(ctx),
                             PropertyVisitor.visitObjectDeclaration(ctx),

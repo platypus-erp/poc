@@ -32,11 +32,11 @@ fun main(args: Array<String>) {
             }
             route("/model") {
                 get("{modelName}/{id}") {
-                    val modelName = call.parameters["modelName"] as String
-                    val id = call.parameters["id"]?.toInt() ?: throw RequestParameterNotFound("id", call.request.toString())
-                    val model = TableRegistry.tables[modelName] ?: throw ModelNotFoundException(modelName)
-                    val entity = model[id]
-                    call.respondText(entity.toJson().toJsonString(), ContentType.Text.Html)
+//                    val modelName = call.parameters["modelName"] as String
+//                    val id = call.parameters["id"]?.toInt() ?: throw RequestParameterNotFound("id", call.request.toString())
+//                    val model = TableRegistry.tables[modelName] ?: throw ModelNotFoundException(modelName)
+//                    val entity = model[id]
+//                    call.respondText(entity.toJson().toJsonString(), ContentType.Text.Html)
                 }
                 get("/{modelName}/") {
                     val modelName = call.parameters["modelName"] as String
@@ -52,12 +52,12 @@ fun main(args: Array<String>) {
             }
             route("/view") {
                 get("{modelName}/{viewType}/{idForm}") {
-                    val modelName = call.parameters["modelName"] as String
-                    val idForm = call.parameters["idForm"] as String
-                    val viewType = ViewTypeRegistry[call.parameters["viewType"] as String]
-                    val model = TableRegistry.tables[modelName]?.model ?: throw ModelNotFoundException(modelName)
-                    val form = model.views[viewType, idForm] ?: throw FormViewNotFoundException(modelName, idForm)
-                    call.respondText(form.compiledView, ContentType.Text.Html)
+//                    val modelName = call.parameters["modelName"] as String
+//                    val idForm = call.parameters["idForm"] as String
+//                    val viewType = ViewTypeRegistry[call.parameters["viewType"] as String]
+//                    val model = TableRegistry.tables[modelName]?.model ?: throw ModelNotFoundException(modelName)
+//                    val form = model.views[viewType, idForm] ?: throw FormViewNotFoundException(modelName, idForm)
+//                    call.respondText(form.compiledView, ContentType.Text.Html)
                 }
             }
             route("/test"){

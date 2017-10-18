@@ -17,6 +17,7 @@
 
 package com.squareup.kotlinpoet
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.NestingKind.MEMBER
@@ -53,6 +54,7 @@ class ClassName internal constructor(
   override fun asNullable() = ClassName(names, true, annotations)
 
   override fun asNonNullable() = ClassName(names, false, annotations)
+  fun asNullable(nullable:Boolean) = ClassName(names, nullable, annotations)
 
   override fun annotated(annotations: List<AnnotationSpec>)
       = ClassName(names, nullable, this.annotations + annotations)

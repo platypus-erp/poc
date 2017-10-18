@@ -13,7 +13,7 @@ import org.platypus.modules.lang.kotlin.KotlinParserBaseVisitor
  * on 07/10/17.
  */
 
-data class NewSimpleFieldAntlr(val readonly: Boolean, val compute: FieldTypeCompute, val type: SimplePropertyType)
+data class NewSimpleFieldAntlr(val readonly: Boolean,val required: Boolean, val compute: FieldTypeCompute, val type: SimplePropertyType)
 
 data class NewReletationFieldAntlr(val m: NewSimpleFieldAntlr, val target: Pair<String, String>)
 
@@ -29,12 +29,17 @@ object PropertyVisitor : KotlinParserBaseVisitor<Set<ModelProperty>>() {
             if (ctx.multipleVariableDeclarations() != null) {
                 // error only on field par line
             }
-            val simpleProperty = SimplePropertyVisitor.visitExpression(ctx.expression())
-            return if (simpleProperty != null) {
-                setOf(ModelProperty(propertyName, simpleProperty.readonly, simpleProperty.compute, simpleProperty.type))
-            } else {
-                val relProperty = RelPropertyVisitor.visitExpression(ctx.expression())
-                setOf(ModelProperty(propertyName, relProperty.m.readonly, relProperty.m.compute, relProperty.m.type, relProperty.target))
+            val isField = SimplePropertyValidator.visitExpression(ctx.expression())
+            return if (isField){
+                val simpleProperty = SimplePropertyVisitor.visitExpression(ctx.expression())
+                if (simpleProperty != null) {
+                    setOf(ModelProperty(propertyName, simpleProperty.readonly,simpleProperty.required, simpleProperty.compute, simpleProperty.type))
+                } else {
+                    val relProperty = RelPropertyVisitor.visitExpression(ctx.expression())
+                    setOf(ModelProperty(propertyName, relProperty.m.readonly, relProperty.m.required, relProperty.m.compute, relProperty.m.type, relProperty.target))
+                }
+            }else {
+                emptySet()
             }
         } else {
             return emptySet()
@@ -56,21 +61,28 @@ object RelPropertyVisitor : KotlinParserBaseVisitor<NewReletationFieldAntlr>() {
     }
 }
 
+object SimplePropertyValidator : KotlinParserBaseVisitor<Boolean>() {
+    override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): Boolean {
+        val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
+        return mName == "newfield" || mName == "compute" || mName == "computeStore"
+    }
+}
+
 object SimplePropertyVisitor : KotlinParserBaseVisitor<NewSimpleFieldAntlr>() {
 
     override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): NewSimpleFieldAntlr? {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
         if (mName == "newfield") {
-            val type = SimplePropertyVisitor.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
-            return NewSimpleFieldAntlr(false, FieldTypeCompute.NEWFIELD, type.type)
+            val type = GetNewFieldType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
+            return NewSimpleFieldAntlr(false,false, FieldTypeCompute.NEWFIELD, type)
         }
         if (mName == "compute") {
             val type = SimplePropertyVisitor.visitCallSuffix(ctx.callSuffix())
-            return NewSimpleFieldAntlr(type.readonly, FieldTypeCompute.COMPUTE, type.type)
+            return NewSimpleFieldAntlr(type.readonly,type.required, FieldTypeCompute.COMPUTE, type.type)
         }
         if (mName == "computeStore") {
             val type = SimplePropertyVisitor.visitCallSuffix(ctx.callSuffix())
-            return NewSimpleFieldAntlr(type.readonly, FieldTypeCompute.COMPUTESTORE, type.type)
+            return NewSimpleFieldAntlr(type.readonly,type.required, FieldTypeCompute.COMPUTESTORE, type.type)
         }
         return null
     }
@@ -98,7 +110,6 @@ object GetNewFieldType : KotlinParserBaseVisitor<SimplePropertyType>() {
 
     override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): SimplePropertyType {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
-        println(mName)
         return SimplePropertyType.valueOf(mName.toUpperCase())
     }
 

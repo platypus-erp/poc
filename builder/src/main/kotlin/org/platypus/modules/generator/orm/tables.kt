@@ -2,6 +2,8 @@ package org.platypus.modules.generator.orm
 
 import com.squareup.kotlinpoet.*
 import org.jetbrains.exposed.sql.Column
+import org.platypus.core.orm.PlatypusEntity
+import org.platypus.core.orm.PlatypusEntityClass
 import org.platypus.core.orm.PlatypusTable
 import org.platypus.modules.data.Model
 import org.platypus.modules.data.SimplePropertyType
@@ -13,40 +15,40 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-
-val i = """
-    object PartnerTagsTable : PlatypusTable("partner_tags") {
-    val name = stringColumn("name", PartnerTags.name)
-    val sortcut = stringColumn("sortcut", PartnerTags.shorcut)
-
-}
-        """
-private val platypusTable = PlatypusTable::class.asClassName()
-private val stringColumn = Column::class.asParameterType(String::class)
-private val dateColumn = Column::class.asParameterType(LocalDate::class)
-private val datetimeColumn = Column::class.asParameterType(LocalDateTime::class)
-private val timeColumn = Column::class.asParameterType(LocalTime::class)
-private val textColumn = Column::class.asParameterType(String::class)
-private val binaryColumn = Column::class.asParameterType(Clob::class)
-private val integerColumn = Column::class.asParameterType(Int::class)
-private val floatColumn = Column::class.asParameterType(Float::class)
-private val decimalColumn = Column::class.asParameterType(BigDecimal::class)
-private val booleanColumn = Column::class.asParameterType(Boolean::class)
-private val selectionColumn = Column::class.asParameterType(String::class)
+val platypusTable = PlatypusTable::class.asClassName()
+val platypusEntiy = PlatypusEntity::class.asClassName()
+val platypusEntiyClass = PlatypusEntityClass::class.asClassName()
+val stringColumn = Column::class.asParameterType(String::class)
+val dateColumn = Column::class.asParameterType(LocalDate::class)
+val datetimeColumn = Column::class.asParameterType(LocalDateTime::class)
+val timeColumn = Column::class.asParameterType(LocalTime::class)
+val textColumn = Column::class.asParameterType(String::class)
+val binaryColumn = Column::class.asParameterType(Clob::class)
+val integerColumn = Column::class.asParameterType(Int::class)
+val floatColumn = Column::class.asParameterType(Float::class)
+val decimalColumn = Column::class.asParameterType(BigDecimal::class)
+val booleanColumn = Column::class.asParameterType(Boolean::class)
+val selectionColumn = Column::class.asParameterType(String::class)
 
 
-fun generateTable(m: Model):TypeSpec.Builder {
+fun generateTable(m: Model): TypeSpec.Builder {
     val model = ClassName(m.pkg, m.name)
 
     val tableBuilder = TypeSpec.objectBuilder("${m.name.firstUpper()}Table")
-            .addSuperclassConstructorParameter("%T(%S)", platypusTable, m.name.toSneakeCase())
+            .superclass(platypusTable).addSuperclassConstructorParameter("%S", m.name.toSneakeCase())
 
     for (f in m.simpleField) {
         tableBuilder.addProperty(
                 when (f.type) {
-                    SimplePropertyType.STRING -> PropertySpec.builder(f.name, stringColumn)
-                            .initializer("stringColumn(%S, %T.%N)", f.name, model, f.name)
-                            .build()
+                    SimplePropertyType.STRING -> {
+                        val prop = PropertySpec.builder(f.name, stringColumn);
+                        if (f.required){
+                            prop.initializer("stringColumn(%S, %T.%N)", f.name, model, f.name)
+                        } else {
+                            prop.initializer("stringColumn(%S, %T.%N).nullable()", f.name, model, f.name)
+                        }
+                        prop.build()
+                    }
                     SimplePropertyType.DATE -> PropertySpec.builder(f.name, dateColumn)
                             .initializer("dateColumn(%S, %T.%N)", f.name, model, f.name)
                             .build()
@@ -89,6 +91,6 @@ fun generateTable(m: Model):TypeSpec.Builder {
                     SimplePropertyType.NONE -> throw IllegalStateException()
                 }
         )
-        return tableBuilder
     }
+    return tableBuilder
 }

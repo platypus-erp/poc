@@ -36,6 +36,24 @@ open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
         )
     }
 
+    protected fun booleanColumn(name: String, prop: PlatypusBooleanProperty<*>): Column<Boolean> {
+        return this.registerColumn(name,
+                PlatypusBooleanColumnType(this.tableName, prop.string, prop.required)
+        )
+    }
+
+    protected fun integerColumn(name: String, prop: PlatypusIntegerProperty<*>): Column<Int> {
+        return this.registerColumn(name,
+                PlatypusBooleanColumnType(this.tableName, prop.string, true)
+        )
+    }
+
+    protected fun longColumn(name: String, prop: PlatypusBooleanProperty<*>): Column<Long> {
+        return this.registerColumn(name,
+                PlatypusBooleanColumnType(this.tableName, prop.string, prop.required)
+        )
+    }
+
     protected fun one2manyColumn(name: String, propTarget: PlatypusLongProperty<*>, target: PlatypusTable): Column<EntityID<Long>> {
         return this.reference(name, target)
     }

@@ -4,8 +4,6 @@ import org.platypus.core.orm.Many2ManyModel
 import org.platypus.core.orm.Model
 import org.platypus.core.orm.fields.PlatypusBooleanProperty
 import org.platypus.core.orm.methods.*
-import org.platypus.modules.base.Partner
-import org.platypus.modules.base.ResLang
 import platypus.entity.PartnerCategorieEntity
 import platypus.entity.PartnerEntity
 import platypus.entity.PartnerTagsEntity
@@ -45,14 +43,14 @@ object Partner : Model<PartnerEntity>() {
     val parentName = newfield.string("Parent name", readonly = true/*, related= arrayOf("parent", "name")*/)
     val email = newfield.string("Email", maxSize = 64, required = true)
     val childIds = newfield.one2many("childIds") of Partner.id
-    val lang = newfield.many2one("Language") of ResLang
+//    val lang = newfield.many2one("Language") of ResLang
 
 
     val onChangeName = name.onChange { e, ctx ->
         ctx.withContext("TOTO" to 5).Super(e)
     }
 
-    val onChangeMultiProperty = newMethod.group(displayName, email).onChange(this::onChangeTest)
+//    val onChangeMultiProperty = newMethod.group(displayName, email).onChange(this::onChangeTest)
 
     private fun onChangeTest(e: PartnerEntity, ctx: OnChangeResult<PartnerEntity>) {
 

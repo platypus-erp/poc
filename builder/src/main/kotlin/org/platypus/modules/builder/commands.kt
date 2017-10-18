@@ -1,8 +1,8 @@
 package org.platypus.modules.builder
 
+import com.squareup.kotlinpoet.FileSpec
+import org.platypus.modules.generator.generate
 import org.platypus.modules.parser.ModelsParser
-import org.platypus.modules.generator.orm.EntityGenerator
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -28,7 +28,8 @@ fun launch(mainArgs: Array<String>) {
         "The module don't exist. path=$modulePath"
     }
     val pathSrc = getMainPath(artifactId, group)
-    assert(Files.exists(modulePath)) {
+    println(pathSrc)
+    assert(!Files.exists(pathSrc)) {
         "The module src don't exist. path=$pathSrc"
     }
     val viewsPath = pathSrc.resolve(param["--views"] ?: "views")
@@ -49,7 +50,6 @@ fun launch(mainArgs: Array<String>) {
     }
 
 
-
     val res = ModelsParser.run(pathSrc.resolve(modelsPath))
 
 
@@ -62,29 +62,33 @@ fun launch(mainArgs: Array<String>) {
     }
 
 
-    val pathEntitySrc = pathGenerate.resolve(group.replace(".","/")).resolve("entity")
-    val pathTablesSrc = pathGenerate.resolve(group.replace(".","/")).resolve("tables")
-    val bigFile = EntityGenerator.generateEntitys("modules.entity", res.models, res.imports.values)
+    val pathEntitySrc = pathGenerate.resolve(group.replace(".", "/")).resolve("entity")
+    val pathTablesSrc = pathGenerate.resolve(group.replace(".", "/")).resolve("tables")
+
+//    val bigFile = EntityGenerator.generateEntitys("modules.entity", res.models, res.imports.values)
+
+    val tableFile = FileSpec.builder("$group.$artifactId.models", "${artifactId}Table")
+    generate(res).tables.forEach { tableFile.addType(it) }
+    val entityFile = FileSpec.builder("$group.$artifactId.models", "${artifactId}Entity")
+    generate(res).entity.forEach { entityFile.addType(it) }
 
 
-
-    Files.deleteIfExists(pathEntitySrc.resolve("entity.kt"))
-    val file = Files.createFile(pathEntitySrc.resolve("entity.kt"))
-    Files.write(file, bigFile.toByteArray(Charset.forName("UTF-8")))
+//    Files.deleteIfExists(pathEntitySrc.resolve("entity.kt"))
+//    val file = Files.createFile(pathEntitySrc.resolve("entity.kt"))
+//    Files.write(file, bigFile.toByteArray(Charset.forName("UTF-8")))
+    tableFile.build().writeTo(pathGenerate)
+    entityFile.build().writeTo(pathGenerate)
 }
 
 private fun getMainPath(artifactId: String, group: String): Path {
-    var path = Paths.get("").toAbsolutePath()
+    return Paths.get("").toAbsolutePath()
             .resolve(artifactId)
             .resolve("src").resolve("main").resolve("kotlin")
-    for (g in group.split("\\.")) {
-        path = path.resolve(g)
-    }
-    return path.resolve(artifactId)
+            .resolve(group.replace(".", "/")).resolve(artifactId)
 }
 
-object GenerateEntityAndTable{
-    fun run(pathGenerate:String, artifactId: String, group: String,path: Path) {
+object GenerateEntityAndTable {
+    fun run(pathGenerate: String, artifactId: String, group: String, path: Path) {
 
 
     }

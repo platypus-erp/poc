@@ -1,10 +1,8 @@
 package org.platypus.core.ui
 
-import org.platypus.modules.base.Users
+import org.jetbrains.exposed.sql.Column
 import org.platypus.core.orm.AbstractPlatypusModel
 import org.platypus.core.orm.PlatypusEntity
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.ktor.util.nonceRandom
 import java.util.*
 
 /**
@@ -73,15 +71,15 @@ class Field(col: Column<*>) : ViewNode("field") {
 }
 
 
-val myForm = form("myForm") {
-    group {
-        invisible = true
-        group {
-            field(Users.login) {
-                label = "Login"
-                groups = arrayOf("dskfn")
-            }
-        }
-
-    }
-}
+//val myForm = form("myForm") {
+//    group {
+//        invisible = true
+//        group {
+//            field(Users.login) {
+//                label = "Login"
+//                groups = arrayOf("dskfn")
+//            }
+//        }
+//
+//    }
+//}

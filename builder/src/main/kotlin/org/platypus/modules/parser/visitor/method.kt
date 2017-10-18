@@ -12,7 +12,7 @@ import org.platypus.modules.lang.kotlin.KotlinParserBaseVisitor
  * @since 0.1
  * on 07/10/17.
  */
-data class NewMethodFieldAntlr(val type: MethodType, val paramType: String, val returnType: String)
+data class NewMethodFieldAntlr(val type: MethodType, val paramType: String, val returnType: String?)
 
 object MethodVisitor : KotlinParserBaseVisitor<Set<ModelMethod>>() {
 
@@ -26,10 +26,14 @@ object MethodVisitor : KotlinParserBaseVisitor<Set<ModelMethod>>() {
             if (ctx.multipleVariableDeclarations() != null) {
                 // error only on field par line
             }
-            val meth = ApiMethodVisitor.visitExpression(ctx.expression())
-            return if (meth != null) {
-                setOf(ModelMethod(propertyName, meth.type, meth.paramType, meth.returnType))
-            } else{
+            return if (MethodValidator.visitPropertyDeclaration(ctx)){
+                val meth = ApiMethodVisitor.visitExpression(ctx.expression())
+                return if (meth != null) {
+                    setOf(ModelMethod(propertyName, meth.type, meth.paramType, meth.returnType))
+                } else{
+                    emptySet()
+                }
+            } else {
                 emptySet()
             }
         } else {
@@ -47,20 +51,60 @@ object ApiMethodVisitor : KotlinParserBaseVisitor<NewMethodFieldAntlr?>() {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
         if (mName == "newMethod") {
             val type = GetNewMethodType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))!!
-            val returnType = GetReturnType.visitValueArguments(ctx.callSuffix().valueArguments())!!
-            val paramType = when (type) {
-                MethodType.ONE -> GetParameterOneOrMulti.visitAnnotatedLambda(ctx.callSuffix().annotatedLambda())
-                MethodType.MULTI -> GetParameterOneOrMulti.visitAnnotatedLambda(ctx.callSuffix().annotatedLambda())
-                MethodType.STATIC -> GetParameterStatic.visitAnnotatedLambda(ctx.callSuffix().annotatedLambda())
-                MethodType.NONE -> ""
+
+            val res = when (type) {
+                MethodType.ONE ->{
+                    val returnType = if (ctx.callSuffix() != null){
+                        GetReturnType.visitPostfixUnaryExpression(ctx)
+                    } else{
+                        ""
+                    }
+                    val paramType = GetParameterOneOrMulti.visitPostfixUnaryExpression(ctx)
+                    NewMethodFieldAntlr(type, paramType, returnType)
+                }
+                MethodType.MULTI -> {
+                    val returnType = if (ctx.callSuffix() != null){
+                        GetReturnType.visitPostfixUnaryExpression(ctx)
+                    } else{
+                        ""
+                    }
+                    val paramType = GetParameterOneOrMulti.visitPostfixUnaryExpression(ctx)
+                    NewMethodFieldAntlr(type, paramType, returnType)
+                }
+                MethodType.STATIC -> {
+                    val returnType = if (ctx.callSuffix() != null){
+                        GetReturnType.visitPostfixUnaryExpression(ctx)
+                    } else{
+                        ""
+                    }
+                    val paramType = GetParameterStatic.visitPostfixUnaryExpression(ctx)
+                    NewMethodFieldAntlr(type, paramType, returnType)
+                }
+                MethodType.GROUP -> {
+                    NewMethodFieldAntlr(type, "", "")
+                }
+                MethodType.NONE -> {
+                    NewMethodFieldAntlr(type, "", "")
+                }
             }
-            return NewMethodFieldAntlr(type, returnType, paramType)
+            return res
         }
         return null
     }
 
     override fun defaultResult() = null
     override fun shouldVisitNextChild(node: RuleNode, currentResult: NewMethodFieldAntlr?) = currentResult == null
+}
+
+object MethodValidator : KotlinParserBaseVisitor<Boolean>() {
+
+    override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): Boolean {
+        val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
+        return mName == "newfield" || mName == "compute" || mName == "computeStore"
+    }
+
+    override fun defaultResult() = false
+    override fun shouldVisitNextChild(node: RuleNode, currentResult: Boolean) = !currentResult
 }
 
 object GetNewMethodType : KotlinParserBaseVisitor<MethodType>() {

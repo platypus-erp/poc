@@ -1,8 +1,6 @@
 package org.platypus.modules
 
-import org.platypus.modules.parser.ModelsParser
-import org.platypus.modules.generator.orm.EntityGenerator
-import java.nio.file.Paths
+import org.platypus.modules.builder.launch
 
 /**
  * @author chmuchme
@@ -10,18 +8,10 @@ import java.nio.file.Paths
  * on 14/10/17.
  */
 fun main(args: Array<String>) {
-//    val path = Paths.get(Paths.get("").toAbsolutePath().toString(),"core")
-    val path = Paths.get(Paths.get("").toAbsolutePath().toString(),"core", "src", "main", "kotlin", "sample")
-    if (args.size > 0) {
-        args[0]
-    }
-    val res = ModelsParser.run(path)
-//    val res = parserFacade.parse(File("examples/test.kt"))
-    println(res)
-    val file = EntityGenerator.generateEntitys(res.packageModel, res.models, res.imports.values)
-
-//    print(file)
-//    generateEntityAndTable(path)
+    val group = "org.platypus.erp"
+    val artifact = "base"
+    val arg = arrayOf("--group=$group", "--artifactId=$artifact")
+    launch(arg)
 }
 
 fun String.firstUpper():String{

@@ -73,6 +73,13 @@ open class Model<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 }
 
+open class Inherit<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
+    val id = newfield.long()
+    protected val newMethod = PlatypusMethodsFactory<E>()
+
+    protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
+}
+
 open class InheritModel<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
     protected val newMethod = PlatypusMethodsFactory<E>()
 

@@ -19,7 +19,7 @@ object MethodVisitor : KotlinParserBaseVisitor<Set<ModelMethod>>() {
     override fun visitPropertyDeclaration(ctx: KotlinParser.PropertyDeclarationContext): Set<ModelMethod> {
         if (ctx.expression() != null) {
             val propertyName = ctx.variableDeclarationEntry().text
-            println("Parsing field $propertyName")
+
             if (ctx.modifiers().text != "public") {
                 //error modifier should be public on none
             }
@@ -29,6 +29,7 @@ object MethodVisitor : KotlinParserBaseVisitor<Set<ModelMethod>>() {
             return if (MethodValidator.visitPropertyDeclaration(ctx)){
                 val meth = ApiMethodVisitor.visitExpression(ctx.expression())
                 return if (meth != null) {
+                    println("\tParsing method $propertyName, ${meth.type}")
                     setOf(ModelMethod(propertyName, meth.type, meth.paramType, meth.returnType))
                 } else{
                     emptySet()

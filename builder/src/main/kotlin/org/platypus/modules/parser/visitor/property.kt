@@ -13,7 +13,7 @@ import org.platypus.modules.lang.kotlin.KotlinParserBaseVisitor
  * on 07/10/17.
  */
 
-data class NewSimpleFieldAntlr(val readonly: Boolean,val required: Boolean, val compute: FieldTypeCompute, val type: SimplePropertyType)
+data class NewSimpleFieldAntlr(val readonly: Boolean, val required: Boolean, val compute: FieldTypeCompute, val type: SimplePropertyType)
 
 data class NewReletationFieldAntlr(val m: NewSimpleFieldAntlr, val target: Pair<String, String>)
 
@@ -22,7 +22,7 @@ object PropertyVisitor : KotlinParserBaseVisitor<Set<ModelProperty>>() {
     override fun visitPropertyDeclaration(ctx: KotlinParser.PropertyDeclarationContext): Set<ModelProperty> {
         if (ctx.expression() != null) {
             val propertyName = ctx.variableDeclarationEntry().text
-            println("Parsing field $propertyName")
+
             if (ctx.modifiers().text != "public") {
                 //error modifier should be public on none
             }
@@ -30,15 +30,18 @@ object PropertyVisitor : KotlinParserBaseVisitor<Set<ModelProperty>>() {
                 // error only on field par line
             }
             val isField = SimplePropertyValidator.visitExpression(ctx.expression())
-            return if (isField){
+            return if (isField) {
                 val simpleProperty = SimplePropertyVisitor.visitExpression(ctx.expression())
                 if (simpleProperty != null) {
-                    setOf(ModelProperty(propertyName, simpleProperty.readonly,simpleProperty.required, simpleProperty.compute, simpleProperty.type))
+                    println("$propertyName, ${simpleProperty.type}")
+                    setOf(ModelProperty(propertyName, simpleProperty.readonly, simpleProperty.required, simpleProperty.compute, simpleProperty.type))
                 } else {
+                    print(propertyName)
                     val relProperty = RelPropertyVisitor.visitExpression(ctx.expression())
+                    print(", " + relProperty.m.type)
                     setOf(ModelProperty(propertyName, relProperty.m.readonly, relProperty.m.required, relProperty.m.compute, relProperty.m.type, relProperty.target))
                 }
-            }else {
+            } else {
                 emptySet()
             }
         } else {
@@ -52,7 +55,7 @@ object PropertyVisitor : KotlinParserBaseVisitor<Set<ModelProperty>>() {
 
 object RelPropertyVisitor : KotlinParserBaseVisitor<NewReletationFieldAntlr>() {
     override fun visitInfixFunctionCall(ctx: KotlinParser.InfixFunctionCallContext): NewReletationFieldAntlr? {
-        if (ctx.SimpleName(0).text == "of") {
+        if (ctx.SimpleName().isNotEmpty() && ctx.SimpleName(0).text == "of") {
             val m = SimplePropertyVisitor.visitRangeExpression(ctx.rangeExpression(0))
             val m2 = RelationPropertyVisitor.visitRangeExpression(ctx.rangeExpression(1))
             return NewReletationFieldAntlr(m, m2)
@@ -64,7 +67,14 @@ object RelPropertyVisitor : KotlinParserBaseVisitor<NewReletationFieldAntlr>() {
 object SimplePropertyValidator : KotlinParserBaseVisitor<Boolean>() {
     override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): Boolean {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
+        print("\t $mName : ")
         return mName == "newfield" || mName == "compute" || mName == "computeStore"
+    }
+
+    override fun defaultResult() = true
+    override fun shouldVisitNextChild(node: RuleNode, currentResult: Boolean): Boolean {
+        print(!currentResult)
+        return !currentResult
     }
 }
 
@@ -74,15 +84,15 @@ object SimplePropertyVisitor : KotlinParserBaseVisitor<NewSimpleFieldAntlr>() {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
         if (mName == "newfield") {
             val type = GetNewFieldType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
-            return NewSimpleFieldAntlr(false,false, FieldTypeCompute.NEWFIELD, type)
+            return NewSimpleFieldAntlr(false, false, FieldTypeCompute.NEWFIELD, type)
         }
         if (mName == "compute") {
             val type = SimplePropertyVisitor.visitCallSuffix(ctx.callSuffix())
-            return NewSimpleFieldAntlr(type.readonly,type.required, FieldTypeCompute.COMPUTE, type.type)
+            return NewSimpleFieldAntlr(type.readonly, type.required, FieldTypeCompute.COMPUTE, type.type)
         }
         if (mName == "computeStore") {
             val type = SimplePropertyVisitor.visitCallSuffix(ctx.callSuffix())
-            return NewSimpleFieldAntlr(type.readonly,type.required, FieldTypeCompute.COMPUTESTORE, type.type)
+            return NewSimpleFieldAntlr(type.readonly, type.required, FieldTypeCompute.COMPUTESTORE, type.type)
         }
         return null
     }

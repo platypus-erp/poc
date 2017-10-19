@@ -1,14 +1,10 @@
 package org.platypus.erp.base.models
 
+import org.platypus.core.orm.InheritModel
 import org.platypus.core.orm.Many2ManyModel
 import org.platypus.core.orm.Model
 import org.platypus.core.orm.fields.PlatypusBooleanProperty
 import org.platypus.core.orm.methods.*
-import platypus.entity.PartnerCategorieEntity
-import platypus.entity.PartnerEntity
-import platypus.entity.PartnerTagsEntity
-import platypus.entity.PartnerTitleEntity
-import sample.PartnerTitleExtend
 
 /**
  * @author chmuchme
@@ -16,20 +12,20 @@ import sample.PartnerTitleExtend
  * on 04/10/17.
  */
 //Code to write
-object PartnerTags : Model<PartnerTagsEntity>() {
-    val name = newfield.string()
-    val shorcut = newfield.string()
-}
+//object PartnerTags : Model<PartnerTagsEntity>() {
+//    val name = newfield.string()
+//    val shorcut = newfield.string()
+//}
 
 private const val tt:Int = 0
 
 data class MethodParamsTest(var s: String) : MultiMethodParams, OneMethodParams, StaticMethodParams
 data class MethodReturnTest(var s: String) : MultiMethodReturn, OneMethodReturn, StaticMethodReturn
 
-object PartnerTargsRel : Many2ManyModel(){
-    val partner = ref(Partner)
-    val tags = ref(PartnerTags)
-}
+//object PartnerTargsRel : Many2ManyModel(){
+//    val partner = ref(Partner)
+//    val tags = ref(PartnerTags)
+//}
 
 object Partner : Model<PartnerEntity>() {
     //Simple String Field
@@ -107,15 +103,4 @@ object PartnerTitle : Model<PartnerTitleEntity>() {
     val name = newfield.string("name")
     val sortcut = newfield.string("sortcut")
 
-}
-
-val PartnerTitle.toto: PlatypusBooleanProperty<PartnerTitleEntity>
-    get() = PartnerTitleExtend.toto
-
-object PartnerTitleExtend : Model<PartnerTitleEntity>() {
-    init {
-        sample.PartnerTitle.name
-    }
-
-    val toto = newfield.boolean()
 }

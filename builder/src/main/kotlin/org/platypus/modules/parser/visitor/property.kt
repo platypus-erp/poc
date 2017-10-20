@@ -32,15 +32,18 @@ object PropertyVisitor : KotlinParserBaseVisitor<Set<ModelProperty>>() {
             val isField = SimplePropertyValidator.visitExpression(ctx.expression())
             return if (isField) {
                 val simpleProperty = SimplePropertyVisitor.visitExpression(ctx.expression())
-                if (simpleProperty != null) {
-                    println("$propertyName, ${simpleProperty.type}")
-                    setOf(ModelProperty(propertyName, simpleProperty.readonly, simpleProperty.required, simpleProperty.compute, simpleProperty.type))
-                } else {
-                    print(propertyName)
-                    val relProperty = RelPropertyVisitor.visitExpression(ctx.expression())
-                    print(", " + relProperty.m.type)
-                    setOf(ModelProperty(propertyName, relProperty.m.readonly, relProperty.m.required, relProperty.m.compute, relProperty.m.type, relProperty.target))
+                if (simpleProperty.type != SimplePropertyType.NONE){
+                    return if (simpleProperty.type.simple) {
+                        println("$propertyName, ${simpleProperty.type}")
+                        setOf(ModelProperty(propertyName, simpleProperty.readonly, simpleProperty.required, simpleProperty.compute, simpleProperty.type))
+                    } else {
+                        print(propertyName)
+                        val relProperty = RelPropertyVisitor.visitExpression(ctx.expression())
+                        println(", " + relProperty.m.type)
+                        setOf(ModelProperty(propertyName, relProperty.m.readonly, relProperty.m.required, relProperty.m.compute, relProperty.m.type, relProperty.target))
+                    }
                 }
+                emptySet()
             } else {
                 emptySet()
             }
@@ -67,20 +70,22 @@ object RelPropertyVisitor : KotlinParserBaseVisitor<NewReletationFieldAntlr>() {
 object SimplePropertyValidator : KotlinParserBaseVisitor<Boolean>() {
     override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): Boolean {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
-        print("\t $mName : ")
-        return mName == "newfield" || mName == "compute" || mName == "computeStore"
+        val valid = mName == "newfield" || mName == "compute" || mName == "computeStore"
+        if (valid){
+            print("\t $mName : ")
+        }
+        return valid
     }
 
-    override fun defaultResult() = true
+    override fun defaultResult() = false
     override fun shouldVisitNextChild(node: RuleNode, currentResult: Boolean): Boolean {
-        print(!currentResult)
         return !currentResult
     }
 }
 
 object SimplePropertyVisitor : KotlinParserBaseVisitor<NewSimpleFieldAntlr>() {
 
-    override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): NewSimpleFieldAntlr? {
+    override fun visitPostfixUnaryExpression(ctx: KotlinParser.PostfixUnaryExpressionContext): NewSimpleFieldAntlr {
         val mName = GetAtomicExpressionName.visitAtomicExpression(ctx.atomicExpression())
         if (mName == "newfield") {
             val type = GetNewFieldType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
@@ -94,7 +99,7 @@ object SimplePropertyVisitor : KotlinParserBaseVisitor<NewSimpleFieldAntlr>() {
             val type = SimplePropertyVisitor.visitCallSuffix(ctx.callSuffix())
             return NewSimpleFieldAntlr(type.readonly, type.required, FieldTypeCompute.COMPUTESTORE, type.type)
         }
-        return null
+        return NewSimpleFieldAntlr(false, false, FieldTypeCompute.NONE, SimplePropertyType.NONE)
     }
 
     override fun defaultResult() = null

@@ -1,11 +1,12 @@
 package org.platypus.modules.parser.visitor
 
 import org.antlr.v4.runtime.tree.RuleNode
-import org.platypus.modules.data.Model
+import org.platypus.modules.data.ModelGenerate
 import org.platypus.modules.data.ParseResult
 import org.platypus.modules.data.ParseResultObject
 import org.platypus.modules.lang.kotlin.KotlinParser
 import org.platypus.modules.lang.kotlin.KotlinParserBaseVisitor
+import org.platypus.modules.parser.visitor.methods.MethodVisitor
 
 /**
  * @author chmuchme
@@ -83,7 +84,7 @@ object RootModelVisitor : KotlinParserBaseVisitor<ParseResultObject>() {
         return if (gg != null && ValidatorObject.visitSupertypesSpecifiers(gg)) {
             println("Parsing ${ctx.SimpleName().text}")
             ParseResultObject(
-                    Model("",
+                    ModelGenerate("",
                             ctx.SimpleName().text,
                             MethodVisitor.visitObjectDeclaration(ctx),
                             PropertyVisitor.visitObjectDeclaration(ctx),

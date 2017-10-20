@@ -1,9 +1,6 @@
 package org.platypus.erp.base.models
 
-import org.platypus.core.orm.InheritModel
-import org.platypus.core.orm.Many2ManyModel
 import org.platypus.core.orm.Model
-import org.platypus.core.orm.fields.PlatypusBooleanProperty
 import org.platypus.core.orm.methods.*
 
 /**
@@ -17,7 +14,7 @@ import org.platypus.core.orm.methods.*
 //    val shorcut = newfield.string()
 //}
 
-private const val tt:Int = 0
+private const val tt: Int = 0
 
 data class MethodParamsTest(var s: String) : MultiMethodParams, OneMethodParams, StaticMethodParams
 data class MethodReturnTest(var s: String) : MultiMethodReturn, OneMethodReturn, StaticMethodReturn
@@ -57,7 +54,7 @@ object Partner : Model<PartnerEntity>() {
         s.Super(e, p)
     }
 
-    val multiWithReturn = newMethod.multi(MethodReturnTest::class) { e, p: MethodParamsTest, s ->
+    internal val multiWithReturn = newMethod.multi(MethodReturnTest::class) { e, p: MethodParamsTest, s ->
         s.Super(e, p) // implicit return
     }
 
@@ -86,6 +83,7 @@ object Partner : Model<PartnerEntity>() {
 
 }
 
+data class RE(val f: String) : MultiMethodReturn, MultiMethodParams
 object PartnerCategorie : Model<PartnerCategorieEntity>() {
     val name = newfield.string("Category Name", required = true, translate = true)
     val color = newfield.integer("color", "Color Index")
@@ -96,6 +94,10 @@ object PartnerCategorie : Model<PartnerCategorieEntity>() {
     val active = newfield.boolean(help = "The active choice allows you to hide the category without removing it.")
     val parent_left = newfield.integer()
     val parent_right = newfield.integer()
+
+    val onChangeTest = newMethod.multi { e, p: RE, r ->
+
+    }
 //    partner_id s= many2many("res.partner", id1="category_id", id2="partner_id", stringColumn="Partners"),
 }
 

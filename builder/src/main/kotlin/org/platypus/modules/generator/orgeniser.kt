@@ -1,7 +1,7 @@
 package org.platypus.modules.generator
 
 import org.platypus.modules.data.M2MModel
-import org.platypus.modules.data.Model
+import org.platypus.modules.data.ModelGenerate
 import org.platypus.modules.data.SimplePropertyType
 
 /**
@@ -9,13 +9,13 @@ import org.platypus.modules.data.SimplePropertyType
  * @since 0.1
  * on 17/09/17.
  */
-class ModuleModelOrganiser(models: Set<Model>) {
+class ModuleModelOrganiser(models: Set<ModelGenerate>) {
 
-    private val rootModels: MutableSet<Model> = models.filter { it.root }.toMutableSet()
-    private val inheritModels: MutableSet<Model> = models.filter { !it.root }.toMutableSet()
+    private val rootModels: MutableSet<ModelGenerate> = models.filter { it.root }.toMutableSet()
+    private val inheritModels: MutableSet<ModelGenerate> = models.filter { !it.root }.toMutableSet()
 
     fun resolveM2M() {
-        val m2mModel = mutableSetOf<Model>()
+        val m2mModel = mutableSetOf<ModelGenerate>()
         for (m in rootModels) {
             for (f in m.simpleField) {
                 if (f.type == SimplePropertyType.MANY2MANY) {

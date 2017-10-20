@@ -22,5 +22,8 @@ fun generate(res: ParseResult): GeneratorResult {
         builderEntitySet.add(r.superEntiy)
         builderEntitySet.add(r.entity.build())
     }
+    res.models.forEach{
+        println(it.method)
+    }
     return GeneratorResult(builderSet, builderEntitySet)
 }

@@ -54,7 +54,7 @@ open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
         )
     }
 
-    protected fun one2manyColumn(name: String, propTarget: PlatypusLongProperty<*>, target: PlatypusTable): Column<EntityID<Long>> {
+    protected fun one2manyColumn(name: String, propTarget: O2MColumn, target: Column<EntityID<Long>>): Column<EntityID<Long>> {
         return this.reference(name, target)
     }
 }

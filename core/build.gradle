@@ -2,7 +2,7 @@ group 'org.platypus.erp'
 version '1.0'
 buildscript {
     ext.kotlin_version = '1.1.51'
-    ext.ktor_version = '0.4.0'
+    ext.ktor_version = '0.9.0-alpha-1'
 
     repositories {
         mavenCentral()
@@ -18,20 +18,20 @@ apply plugin: 'kotlin'
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url "https://dl.bintray.com/kotlin/exposed"
+    maven { url "https://dl.bintray.com/kotlin/exposed"}
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
     }
-    maven { url "http://dl.bintray.com/kotlin/ktor" }
-    maven { url "https://dl.bintray.com/kotlin/kotlinx" }
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile 'org.jetbrains.exposed:exposed:0.8.6'
-    compile "org.jetbrains.ktor:ktor-core:$ktor_version"
-    compile "org.jetbrains.ktor:ktor-netty:$ktor_version"
     compile "ch.qos.logback:logback-classic:1.2.1"
-    compile 'com.beust:klaxon:0.30'
+//    compile 'com.beust:klaxon:0.30'
     compile 'org.slf4j:slf4j-api:1.7.25'
 //    compileOnly 'com.h2database:h2:1.4.194'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"

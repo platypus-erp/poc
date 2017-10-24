@@ -11,12 +11,14 @@ import org.jetbrains.exposed.sql.SizedIterable
 import org.platypus.core.orm.PlatypusEntity
 import org.platypus.core.orm.PlatypusEntityClass
 import org.platypus.core.orm.PlatypusTable
+import org.platypus.core.orm.methods.*
 import org.platypus.modules.firstUpper
 import java.math.BigDecimal
 import java.sql.Clob
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import kotlin.reflect.KClass
 
 /**
  * @author chmuchme
@@ -191,9 +193,12 @@ enum class SimplePropertyType(val simple: Boolean,
 enum class FieldTypeCompute {
     NEWFIELD, COMPUTE, COMPUTESTORE, NONE
 }
-
-enum class MethodType {
-    ONE, MULTI, STATIC, NONE, GROUP
+enum class MethodType(val noReturn: KClass<*>,val withReturn: KClass<*>) {
+    ONE(OneMethodResultNoReturn::class,OneMethodResultWithReturn::class),
+    MULTI(MultiMethodResultNoReturn::class, MultiMethodResultWithReturn::class),
+    STATIC(StaticMethodResultNoReturn::class, StaticMethodResultWithReturn::class),
+    NONE(Void::class, Void::class),
+    GROUP(Void::class, Void::class)
 }
 
 data class ParseResult(var packageModel: String = "",
@@ -217,7 +222,7 @@ data class ModelProperty(val name: String,
 data class ModelMethod(val name: String,
                        val type: MethodType,
                        val paramType: String,
-                       val returnType: String?)
+                       val returnType: String)
 
 open class ModelGenerate(
         val pkg: String,

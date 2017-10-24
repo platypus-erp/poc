@@ -118,12 +118,12 @@ fun KClass<*>.asParameterType(k:KClass<*>):ParameterizedTypeName{
   return ParameterizedTypeName.get(this, k)
 }
 
-fun KClass<*>.asParameterType(k:TypeName):ParameterizedTypeName{
-  return ParameterizedTypeName.get(this.asClassName(), k)
+fun KClass<*>.asParameterType(vararg k:TypeName):ParameterizedTypeName{
+  return ParameterizedTypeName.get(this.asClassName(), *k)
 }
 
-fun ClassName.asParameterType(k:TypeName):ParameterizedTypeName{
-  return ParameterizedTypeName.get(this, k)
+fun ClassName.asParameterType(vararg k:TypeName):ParameterizedTypeName{
+  return ParameterizedTypeName.get(this, *k)
 }
 
 fun ClassName.asParameterType(k:KClass<*>):ParameterizedTypeName{

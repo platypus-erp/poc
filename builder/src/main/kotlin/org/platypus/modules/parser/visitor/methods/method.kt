@@ -11,7 +11,7 @@ import org.platypus.modules.parser.visitor.GetAtomicExpressionName
  * @since 0.1
  * on 07/10/17.
  */
-data class NewMethodFieldAntlr(val type: MethodType, val paramType: String, val returnType: String?)
+data class NewMethodFieldAntlr(val type: MethodType, val paramType: String, val returnType: String)
 
 object GetNewMethodType : KotlinParserBaseVisitor<MethodType>() {
 

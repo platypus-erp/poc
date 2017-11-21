@@ -11,9 +11,9 @@ import org.platypus.core.orm.PlatypusEntity
  * @since 0.1
  * on 06/10/17.
  */
-interface PlatypusRefKey<E : PlatypusEntity>
+interface PlatypusRefKey<E : PlatypusEntity<E>>
 
-open class PlatypusLongProperty<E : PlatypusEntity>(
+open class PlatypusLongProperty<E : PlatypusEntity<E>>(
         string: String,
         help: String,
         max: Long,

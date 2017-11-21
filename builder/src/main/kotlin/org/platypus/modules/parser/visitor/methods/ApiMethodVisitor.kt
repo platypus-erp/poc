@@ -14,21 +14,21 @@ object ApiMethodVisitor : KotlinParserBaseVisitor<NewMethodFieldAntlr>() {
             val type = GetNewMethodType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))!!
 
             val res = when (type) {
-                MethodType.ONE ->{
-                    val returnType = GetReturnType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
-                    val paramType = GetParameterOneOrMulti.visitPostfixUnaryExpression(ctx)
-                    NewMethodFieldAntlr(type, paramType, returnType)
-                }
+//                MethodType.ONE ->{
+//                    val returnType = GetReturnType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
+//                    val paramType = GetParameterOneOrMulti.visitPostfixUnaryExpression(ctx)
+//                    NewMethodFieldAntlr(type, paramType, returnType)
+//                }
                 MethodType.MULTI -> {
                     val returnType = GetReturnType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
                     val paramType = GetParameterOneOrMulti.visitPostfixUnaryExpression(ctx)
                     NewMethodFieldAntlr(type, paramType, returnType)
                 }
-                MethodType.STATIC -> {
-                    val returnType = GetReturnType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
-                    val paramType = GetParameterStatic.visitPostfixUnaryExpression(ctx)
-                    NewMethodFieldAntlr(type, paramType, returnType)
-                }
+//                MethodType.STATIC -> {
+//                    val returnType = GetReturnType.visitPostfixUnaryOperation(ctx.postfixUnaryOperation(0))
+//                    val paramType = GetParameterStatic.visitPostfixUnaryExpression(ctx)
+//                    NewMethodFieldAntlr(type, paramType, returnType)
+//                }
                 MethodType.GROUP -> {
                     NewMethodFieldAntlr(type, "", "")
                 }

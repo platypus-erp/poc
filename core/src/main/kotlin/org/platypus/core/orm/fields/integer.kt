@@ -12,7 +12,7 @@ import java.math.BigDecimal
  * @since 0.1
  * on 06/10/17.
  */
-class PlatypusIntegerProperty<E : PlatypusEntity>(
+class PlatypusIntegerProperty<E : PlatypusEntity<E>>(
         string: String,
         help: String,
         max: Int,

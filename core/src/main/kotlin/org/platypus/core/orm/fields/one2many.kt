@@ -8,9 +8,9 @@ import org.platypus.core.orm.PlatypusEntity
  * @since 0.1
  * on 06/10/17.
  */
-class KassiopiaO2MColumnTmp<E : PlatypusEntity>(private val model: AbstractPlatypusModel<E>) {
-    infix fun <T: PlatypusEntity> of(target: PlatypusLongProperty<T>)=  O2MColumn(this.model, target)
-    infix fun <T: PlatypusEntity> of(target: PlatypusRefKey<T>) = O2MColumn(this.model, target)
+class KassiopiaO2MColumnTmp<E : PlatypusEntity<E>>(private val model: AbstractPlatypusModel<E>) {
+    infix fun <T: PlatypusEntity<T>> of(target: PlatypusLongProperty<T>)=  O2MColumn(this.model, target)
+    infix fun <T: PlatypusEntity<T>> of(target: PlatypusRefKey<T>) = O2MColumn(this.model, target)
 }
 
-class O2MColumn<E : PlatypusEntity, T: PlatypusEntity>(val model: AbstractPlatypusModel<E>, val target: PlatypusRefKey<T>)
+class O2MColumn<E : PlatypusEntity<E>, T: PlatypusEntity<T>>(val model: AbstractPlatypusModel<E>, val target: PlatypusRefKey<T>)

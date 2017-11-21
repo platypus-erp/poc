@@ -20,7 +20,7 @@ interface DecimalPrecision {
 }
 
 
-class PlatypusDecimalProperty<E : PlatypusEntity>(
+class PlatypusDecimalProperty<E : PlatypusEntity<E>>(
         string: String,
         help: String,
         max: Float,

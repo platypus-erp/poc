@@ -10,7 +10,7 @@ import java.time.LocalDate
  * @since 0.1
  * on 06/10/17.
  */
-class PlatypusBooleanProperty<E : PlatypusEntity>(
+class PlatypusBooleanProperty<E : PlatypusEntity<E>>(
         string: String,
         help: String,
         val required: Boolean,

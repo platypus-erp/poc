@@ -11,15 +11,12 @@ import org.platypus.core.orm.methods.*
 interface Method
 
 
-class PlatypusMethodsFactory<ENTITY : PlatypusEntity> {
+class PlatypusMethodsFactory<ENTITY : PlatypusEntity<ENTITY>> {
+
+    fun <PARAM, RETURN> multitest(
+            comp: (entity: Collection<ENTITY>, param: PARAM, env: MultiMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN)
+            = MultiMethodDefWithReturn(comp)
 
     fun <PARAM, RETURN> multi(comp: (entity: Collection<ENTITY>, param: PARAM, env: MultiMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN) = MultiMethodDefWithReturn(comp)
-
-    fun <PARAM, RETURN> one(comp: (entity: ENTITY, param: PARAM, env: CTX<ENTITY, PARAM, RETURN>) -> RETURN) = OneMethodDefWithReturn(comp)
-
-    @JvmName("model")
-    fun <PARAM, RETURN> static(comp: (param: PARAM, env: StaticMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN) = StaticMethodDefWithReturn(comp)
-
-    fun group(vararg props: PlatypusProperty) = OnChangeGroup<ENTITY>(props)
 }
 

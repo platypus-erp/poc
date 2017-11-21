@@ -16,8 +16,24 @@ import kotlin.reflect.KClass
  * on 16/07/17.
  */
 
+class Environement(
+        private val context: HashMap<String, Any> = HashMap()
+) {
 
-abstract class PlatypusEntity(id: EntityID<Long>) : LongEntity(id){
+    private val uid = 0
+}
+
+
+abstract class PlatypusEntity<SELF : PlatypusEntity<SELF>>(
+        private val cls: PlatypusEntityClass<SELF>,
+        id: EntityID<Long>) : LongEntity(id) {
+
+    val env = Environement()
+
+    fun withContext(vararg value: Pair<String, Any>): SELF {
+        val self = cls.get(this.id)
+        return self
+    }
 
     fun checkRecusion(): Boolean {
         //TODO to implement copy on hexia ?
@@ -25,16 +41,16 @@ abstract class PlatypusEntity(id: EntityID<Long>) : LongEntity(id){
     }
 }
 
-abstract class PlatypusEntityClass<E : PlatypusEntity, OE: PlatypusEntityClass<E, OE>>
-(val model: Model<E>,val platypusTable: PlatypusTable, val entityType: KClass<E>) : LongEntityClass<E>(platypusTable) {
+abstract class PlatypusEntityClass<E : PlatypusEntity<E>>
+(val model: Model<E>, val platypusTable: PlatypusTable, val entityType: KClass<E>) : LongEntityClass<E>(platypusTable) {
 
 
 }
 
 object TableRegistry {
-    val tables = mutableMapOf<String, PlatypusEntityClass<*,*>>()
+    val tables = mutableMapOf<String, PlatypusEntityClass<*>>()
 
-    fun addTable(model: PlatypusEntityClass<*, *>) {
+    fun addTable(model: PlatypusEntityClass<*>) {
         if (KassiopiaErp.currentStep == KassiopiaStep.BOOT) {
             tables[model.table.tableName] = model
         }

@@ -197,9 +197,7 @@ enum class FieldTypeCompute {
 }
 
 enum class MethodType(val noReturn: KClass<*>, val withReturn: KClass<*>) {
-    ONE(OneMethodResultNoReturn::class, CTX::class),
     MULTI(MultiMethodResultNoReturn::class, MultiMethodResultWithReturn::class),
-    STATIC(StaticMethodResultNoReturn::class, StaticMethodResultWithReturn::class),
     NONE(Void::class, Void::class),
     GROUP(Void::class, Void::class)
 }

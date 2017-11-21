@@ -69,7 +69,7 @@ open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
     }
 }
 
-sealed class AbstractPlatypusModel<E : PlatypusEntity> {
+sealed class AbstractPlatypusModel<E : PlatypusEntity<E>> {
 
     protected val field = PlatypusPropertyFactory(this)
     fun compute(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
@@ -82,35 +82,23 @@ data class SearchByNameParam(var value: String,
                              var additionnalCond: Op<Boolean>,
                              var limit: Int)
 
-open class Model<E : PlatypusEntity>(val compObj: PlatypusEntityClass<E, *>) : AbstractPlatypusModel<E>() {
+open class Model<E : PlatypusEntity<E>>(val compObj: PlatypusEntityClass<E>) : AbstractPlatypusModel<E>() {
     val id = field.long()
     val nameField = field.string("Name")
 
     protected val newMethod = PlatypusMethodsFactory<E>()
 
-    val nameGet = newMethod.one(
-            fun(e: E, p: Nothing, env: CTX<E, Nothing, String>): String {
-                return ""
-            }
-    )
-
-    val searchByName = newMethod.static(
-            fun(p: SearchByNameParam, env: StaticMethodResultWithReturn<E, SearchByNameParam, SizedIterable<E>>): SizedIterable<E> {
-                return compObj.find { (p.operator(compObj.platypusTable.name, p.value)) and p.additionnalCond }
-            }
-    )
-
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 }
 
-open class Inherit<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
+open class Inherit<E : PlatypusEntity<E>> : AbstractPlatypusModel<E>() {
     val id = field.long()
     protected val newMethod = PlatypusMethodsFactory<E>()
 
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 }
 
-open class InheritModel<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
+open class InheritModel<E : PlatypusEntity<E>> : AbstractPlatypusModel<E>() {
     protected val newMethod = PlatypusMethodsFactory<E>()
 
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
@@ -123,17 +111,17 @@ open class Many2ManyTable(tableName: String = "") : PlatypusTable(tableName) {
 }
 
 
-open class TemporaryModel<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>() {
+open class TemporaryModel<E : PlatypusEntity<E>>(tableName: String = "") : AbstractPlatypusModel<E>() {
 
 
 }
 
-open class View<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>() {
+open class View<E : PlatypusEntity<E>>(tableName: String = "") : AbstractPlatypusModel<E>() {
 
 
 }
 
-open class MaterializedView<E : PlatypusEntity>(tableName: String = "") : AbstractPlatypusModel<E>() {
+open class MaterializedView<E : PlatypusEntity<E>>(tableName: String = "") : AbstractPlatypusModel<E>() {
 
 
 }

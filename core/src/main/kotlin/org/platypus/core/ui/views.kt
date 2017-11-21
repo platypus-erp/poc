@@ -10,7 +10,7 @@ import java.util.*
  * @since 0.1
  * on 07/09/17.
  */
-class ViewModelRegistry<E : PlatypusEntity>(val model: AbstractPlatypusModel<E>) {
+class ViewModelRegistry<E : PlatypusEntity<E>>(val model: AbstractPlatypusModel<E>) {
     val views: MutableMap<ViewType, MutableMap<String, ViewNode>> = mutableMapOf()
 
     operator fun get(viewType: ViewType, id: String): ViewNode? {

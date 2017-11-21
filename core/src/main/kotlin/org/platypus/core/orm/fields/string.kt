@@ -11,7 +11,7 @@ import org.platypus.core.orm.methods.*
  * @since 0.1
  * on 06/10/17.
  */
-open class PlatypusStringProperty<E : PlatypusEntity>(
+open class PlatypusStringProperty<E : PlatypusEntity<E>>(
         string: String,
         help: String = "",
         var regexp: Regex?,
@@ -27,11 +27,9 @@ open class PlatypusStringProperty<E : PlatypusEntity>(
         var ecripted: Boolean
 ) : PlatypusProperty(string, help) {
 
-    fun onChange(comp: (entity: E, param: OnChangeResult<E>) -> Unit) = OnChangeMethodDef(comp)
-
 }
 
-class ComputePlatypusStringProperty<E : PlatypusEntity>(prop: PlatypusStringProperty<E>) : PlatypusStringProperty<E>(
+class ComputePlatypusStringProperty<E : PlatypusEntity<E>>(prop: PlatypusStringProperty<E>) : PlatypusStringProperty<E>(
         prop.string, prop.help, prop.regexp, prop.minSize, prop.maxSize,
         prop.defaultValue, prop.prefix, prop.suffix, prop.required,
         prop.allowBlank, prop.readonly, prop.trim, prop.ecripted) {
@@ -41,7 +39,7 @@ class ComputePlatypusStringProperty<E : PlatypusEntity>(prop: PlatypusStringProp
     fun setter(comp: (entity: E, value: String, param: ComputeSetStringResult<E>) -> Unit) = ComputeSetStringMethodDef(comp)
 }
 
-class ComputeStorePlatypusStringProperty<E : PlatypusEntity>(prop: PlatypusStringProperty<E>) : PlatypusStringProperty<E>(
+class ComputeStorePlatypusStringProperty<E : PlatypusEntity<E>>(prop: PlatypusStringProperty<E>) : PlatypusStringProperty<E>(
         prop.string, prop.help, prop.regexp, prop.minSize, prop.maxSize,
         prop.defaultValue, prop.prefix, prop.suffix, prop.required,
         prop.allowBlank, prop.readonly, prop.trim, prop.ecripted) {

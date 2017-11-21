@@ -12,7 +12,7 @@ import java.time.ZoneOffset
  * @since 0.1
  * on 06/10/17.
  */
-class PlatypusTimeProperty<E : PlatypusEntity>(
+class PlatypusTimeProperty<E : PlatypusEntity<E>>(
         string: String,
         help: String,
         private val min: LocalTime,

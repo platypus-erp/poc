@@ -61,7 +61,7 @@ interface MethodContext {
 
 
 
-interface MutliMethodContext<E : PlatypusEntity> : MethodContext {
+interface MutliMethodContext<E : PlatypusEntity<E>> : MethodContext {
 
     fun Super(entity: E)
     override fun withContext(vararg value: Pair<String, Any>): MutliMethodContext<E>

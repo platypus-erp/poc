@@ -67,17 +67,19 @@ fun launch(mainArgs: Array<String>) {
 
 //    val bigFile = EntityGenerator.generateEntitys("modules.entity", res.models, res.imports.values)
 
+    val generateResult = generate(res)
+
     val tableFile = FileSpec.builder("$group.$artifactId.models", "${artifactId}Table")
-    generate(res).tables.forEach { tableFile.addType(it) }
+    generateResult.tables.forEach { tableFile.addType(it) }
     val entityFile = FileSpec.builder("$group.$artifactId.models", "${artifactId}Entity")
-    generate(res).entity.forEach { entityFile.addType(it) }
+    generateResult.entity.forEach { entityFile.addType(it) }
 
 
 //    Files.deleteIfExists(pathEntitySrc.resolve("entity.kt"))
 //    val file = Files.createFile(pathEntitySrc.resolve("entity.kt"))
 //    Files.write(file, bigFile.toByteArray(Charset.forName("UTF-8")))
-    tableFile.build().writeTo(pathGenerate)
-    entityFile.build().writeTo(pathGenerate)
+    tableFile.indent("    ").build().writeTo(pathGenerate)
+    entityFile.indent("    ").build().writeTo(pathGenerate)
 }
 
 private fun getMainPath(artifactId: String, group: String): Path {

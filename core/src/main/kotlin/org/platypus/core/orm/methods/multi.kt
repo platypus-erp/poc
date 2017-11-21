@@ -8,11 +8,11 @@ import org.platypus.core.orm.PlatypusEntity
  * @since 0.1
  * on 04/10/17.
  */
-open class MultiMethodResultNoReturn<ENTITY : PlatypusEntity, PARAM : MultiMethodParams>(private val stackOnChange: MultiMethodDefNoReturn<ENTITY, PARAM>) {
+open class MultiMethodResultNoReturn<ENTITY : PlatypusEntity, PARAM>(private val stackOnChange: MultiMethodDefNoReturn<ENTITY, PARAM>) {
     val errors: MutableSet<RuntimeException> = mutableSetOf()
     //    val original = lazy { entity.klass[entity.id] }
     val warnings: MutableSet<String> = mutableSetOf()
-    val ctx: MutableMap<String, Any> = mutableMapOf()
+    val ctx=  Context(mutableMapOf())
     private var specialContext: Array<out Pair<String, Any>> = emptyArray()
 
     fun Super(entity: Collection<ENTITY>, param: PARAM): Unit {
@@ -40,7 +40,7 @@ open class MultiMethodResultNoReturn<ENTITY : PlatypusEntity, PARAM : MultiMetho
 }
 
 
-class MultiMethodDefNoReturn<ENTITY : PlatypusEntity, PARAM : MultiMethodParams>(
+class MultiMethodDefNoReturn<ENTITY : PlatypusEntity, PARAM>(
         var comp: (entity: Collection<ENTITY>, param: PARAM, res: MultiMethodResultNoReturn<ENTITY, PARAM>) -> Unit,
         var previous: MultiMethodDefNoReturn<ENTITY, PARAM>? = null
 ) : Method {
@@ -51,7 +51,7 @@ class MultiMethodDefNoReturn<ENTITY : PlatypusEntity, PARAM : MultiMethodParams>
     }
 }
 
-open class MultiMethodResultWithReturn<ENTITY : PlatypusEntity, PARAM : MultiMethodParams, RETURN : MultiMethodReturn>(private val stackOnChange: MultiMethodDefWithReturn<ENTITY, PARAM, RETURN>) {
+open class MultiMethodResultWithReturn<ENTITY : PlatypusEntity, PARAM, RETURN>(private val stackOnChange: MultiMethodDefWithReturn<ENTITY, PARAM, RETURN>) {
     val errors: MutableSet<RuntimeException> = mutableSetOf()
     //    val original = lazy { entity.klass[entity.id] }
     val warnings: MutableSet<String> = mutableSetOf()
@@ -84,7 +84,7 @@ open class MultiMethodResultWithReturn<ENTITY : PlatypusEntity, PARAM : MultiMet
 }
 
 
-class MultiMethodDefWithReturn<ENTITY : PlatypusEntity, PARAM : MultiMethodParams, RETURN : MultiMethodReturn>(
+class MultiMethodDefWithReturn<ENTITY : PlatypusEntity, PARAM, RETURN>(
         var comp: (entity: Collection<ENTITY>, param: PARAM, res: MultiMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN?,
         var previous: MultiMethodDefWithReturn<ENTITY, PARAM, RETURN>? = null
 ) : Method {
@@ -94,7 +94,3 @@ class MultiMethodDefWithReturn<ENTITY : PlatypusEntity, PARAM : MultiMethodParam
         this.comp = comp
     }
 }
-
-
-interface MultiMethodReturn
-interface MultiMethodParams

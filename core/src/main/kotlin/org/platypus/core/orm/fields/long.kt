@@ -11,14 +11,16 @@ import org.platypus.core.orm.PlatypusEntity
  * @since 0.1
  * on 06/10/17.
  */
-class PlatypusLongProperty<E : PlatypusEntity>(
+interface PlatypusRefKey<E : PlatypusEntity>
+
+open class PlatypusLongProperty<E : PlatypusEntity>(
         string: String,
         help: String,
         max: Long,
         min: Long,
         required: Boolean,
         widget: ColumnWidget
-) : PlatypusProperty(string, help)
+) : PlatypusRefKey<E>, PlatypusProperty(string, help)
 
 class PlatypusLongColumnType(
         private val tableHolderName: String,

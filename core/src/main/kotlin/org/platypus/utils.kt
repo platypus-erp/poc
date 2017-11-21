@@ -1,5 +1,6 @@
 package org.platypus
 
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SizedIterable
 
 /**
@@ -11,6 +12,7 @@ fun <T> MutableCollection<T>.addIf(condiftion: Boolean, lazyMessage: () -> T) {
     if (!condiftion) {
         this.add(lazyMessage())
     }
+    Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver")
 }
 
 val <T : Any> SizedIterable<T>.notEmpty: Boolean

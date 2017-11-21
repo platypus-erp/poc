@@ -13,7 +13,7 @@ import org.platypus.core.orm.methods.*
  */
 open class PlatypusStringProperty<E : PlatypusEntity>(
         string: String,
-        help: String,
+        help: String = "",
         var regexp: Regex?,
         var minSize: Int,
         var maxSize: Int,

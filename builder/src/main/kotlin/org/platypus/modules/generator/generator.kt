@@ -10,20 +10,17 @@ import org.platypus.modules.generator.orm.generateTable
  * @since 0.1
  * on 14/10/17.
  */
-data class GeneratorResult(val tables:Set<TypeSpec>, val entity:Set<TypeSpec>)
+data class GeneratorResult(val tables:Set<TypeSpec>, val entity:List<TypeSpec>)
 
 fun generate(res: ParseResult): GeneratorResult {
     val builderSet: MutableSet<TypeSpec> = HashSet()
-    val builderEntitySet: MutableSet<TypeSpec> = HashSet()
+    val builderEntitySet: MutableList<TypeSpec> = ArrayList()
     res.models.mapTo(builderSet) { generateTable(it).build() }
     res.models.forEach{
         val r = generateEntity(it)
         builderEntitySet.add(r.superCompanion)
         builderEntitySet.add(r.superEntiy)
         builderEntitySet.add(r.entity.build())
-    }
-    res.models.forEach{
-        println(it.method)
     }
     return GeneratorResult(builderSet, builderEntitySet)
 }

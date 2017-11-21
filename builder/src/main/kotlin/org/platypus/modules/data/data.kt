@@ -1,10 +1,6 @@
 package org.platypus.modules.data
 
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asParameterType
-import org.jetbrains.exposed.dao.Entity
+import com.squareup.kotlinpoet.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SizedIterable
@@ -29,6 +25,12 @@ val platypusEntity = org.platypus.core.orm.PlatypusEntity::class.asClassName()
 val platypusEntityClass = org.platypus.core.orm.PlatypusEntityClass::class.asClassName()
 val sizedIterator = SizedIterable::class.asClassName()
 val entityId = EntityID::class.asParameterType(Long::class)
+
+fun KClass<*>.asParameterType(vararg kClass: KClass<*>) = ParameterizedTypeName.get(this, *kClass)
+fun KClass<*>.asParameterType(vararg kClass: TypeName) = ParameterizedTypeName.get(this.asClassName(), *kClass)
+fun ClassName.asParameterType(vararg kClass: TypeName) = ParameterizedTypeName.get(this, *kClass)
+fun ClassName.asNullable(b: Boolean) = if (b) this.asNullable() else this.asNonNullable()
+
 val stringClass = String::class.asClassName()
 val dateClass = LocalDate::class.asClassName()
 val datetimeClass = LocalDateTime::class.asClassName()
@@ -193,8 +195,9 @@ enum class SimplePropertyType(val simple: Boolean,
 enum class FieldTypeCompute {
     NEWFIELD, COMPUTE, COMPUTESTORE, NONE
 }
-enum class MethodType(val noReturn: KClass<*>,val withReturn: KClass<*>) {
-    ONE(OneMethodResultNoReturn::class,OneMethodResultWithReturn::class),
+
+enum class MethodType(val noReturn: KClass<*>, val withReturn: KClass<*>) {
+    ONE(OneMethodResultNoReturn::class, CTX::class),
     MULTI(MultiMethodResultNoReturn::class, MultiMethodResultWithReturn::class),
     STATIC(StaticMethodResultNoReturn::class, StaticMethodResultWithReturn::class),
     NONE(Void::class, Void::class),

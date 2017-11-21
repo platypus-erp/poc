@@ -11,7 +11,7 @@ import org.platypus.core.SelectionValueNotFound
 typealias SelectionValues = MutableMap<String, SelectionValue>
 
 
-open class SelectionType
+interface SelectionType
 
 object SelectionRegistry {
     private val registry = mutableMapOf<SelectionType, SelectionValues>()

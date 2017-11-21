@@ -1,9 +1,7 @@
 package org.platypus.core.orm
 
-import com.sun.org.apache.bcel.internal.generic.RETURN
 import org.platypus.core.orm.fields.PlatypusProperty
 import org.platypus.core.orm.methods.*
-import kotlin.reflect.KClass
 
 /**
  * @author chmuchme
@@ -15,34 +13,12 @@ interface Method
 
 class PlatypusMethodsFactory<ENTITY : PlatypusEntity> {
 
-    fun <PARAM : MultiMethodParams, RETURN : MultiMethodReturn>
-            multi(returnType: KClass<RETURN>,
-                  comp: (entity: Collection<ENTITY>, param: PARAM, res: MultiMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN?)
-            = MultiMethodDefWithReturn(comp)
+    fun <PARAM, RETURN> multi(comp: (entity: Collection<ENTITY>, param: PARAM, env: MultiMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN) = MultiMethodDefWithReturn(comp)
 
-    fun <PARAM : MultiMethodParams>
-            multi(comp: (entity: Collection<ENTITY>, param: PARAM, res: MultiMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
-            = MultiMethodDefNoReturn(comp)
-
-    fun <PARAM : OneMethodParams, RETURN : OneMethodReturn>
-            one(returnType: KClass<RETURN>,
-                comp: (entity: ENTITY, param: PARAM, res: OneMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN?)
-            = OneMethodDefWithReturn(comp)
-
-    fun <PARAM : OneMethodParams>
-            one(comp: (entity: ENTITY, param: PARAM, res: OneMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
-            = OneMethodDefNoReturn(comp)
+    fun <PARAM, RETURN> one(comp: (entity: ENTITY, param: PARAM, env: CTX<ENTITY, PARAM, RETURN>) -> RETURN) = OneMethodDefWithReturn(comp)
 
     @JvmName("model")
-    fun <PARAM : StaticMethodParams, RETURN : StaticMethodReturn>
-            static(returnType: KClass<RETURN>,
-                comp: (param: PARAM, res: StaticMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN?)
-            = StaticMethodDefWithReturn(comp)
-
-    @JvmName("model")
-    fun <PARAM : StaticMethodParams>
-            static(comp: (param: PARAM, res: StaticMethodResultNoReturn<ENTITY, PARAM>) -> Unit)
-            = StaticMethodDefNoReturn(comp)
+    fun <PARAM, RETURN> static(comp: (param: PARAM, env: StaticMethodResultWithReturn<ENTITY, PARAM, RETURN>) -> RETURN) = StaticMethodDefWithReturn(comp)
 
     fun group(vararg props: PlatypusProperty) = OnChangeGroup<ENTITY>(props)
 }

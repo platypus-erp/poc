@@ -25,6 +25,10 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile 'org.jetbrains.exposed:exposed:0.8.2'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.postgresql:postgresql:9.4.1212.jre6'
+    testCompile 'com.h2database:h2:1.4.196'
+
     compile project(':core')
 }
 

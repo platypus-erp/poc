@@ -1,18 +1,15 @@
 package org.platypus.core.orm.fields
 
 import org.platypus.core.orm.AbstractPlatypusModel
+import org.platypus.core.orm.PlatypusEntity
 
 /**
  * @author chmuchme
  * @since 0.1
  * on 06/10/17.
  */
-class KassiopiaM2OColumnTmp {
-    infix fun of(target: AbstractPlatypusModel<*>): PlatypusM2OColumnProperty = PlatypusM2OColumnProperty(target)
+class KassiopiaM2OColumnTmp<E : PlatypusEntity>(private val model: AbstractPlatypusModel<E>) {
+    infix fun <T: PlatypusEntity> of(target: AbstractPlatypusModel<T>) = PlatypusM2OColumnProperty<E, T>(target)
 }
 
-class M2MColumn(val model: AbstractPlatypusModel<*>, val name: String, val target: M2MColumn)
-
-data class PlatypusM2OColumnProperty(
-        val model: AbstractPlatypusModel<*>
-)
+data class PlatypusM2OColumnProperty<E : PlatypusEntity, T : PlatypusEntity>(val model: AbstractPlatypusModel<T>) : PlatypusRefKey<E>

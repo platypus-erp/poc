@@ -1,14 +1,13 @@
 package org.platypus.core.orm.fields
 
-import org.jetbrains.exposed.sql.ColumnType
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.platypus.core.ColumnWidget
 import org.platypus.core.HtmlWidget
 import org.platypus.core.orm.AbstractPlatypusModel
-import org.platypus.core.orm.Model
 import org.platypus.core.orm.PlatypusEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
+import kotlin.reflect.KClass
 
 /**
  * @author chmuchme
@@ -32,8 +31,12 @@ class PlatypusPropertyFactory<E : PlatypusEntity>(private val model:AbstractPlat
                readonly: Boolean? = null,
                translate: Boolean? = null,
                trim: TrimType = TrimType.NONE,
-               ecripted: Boolean? = null
-    ) = PlatypusStringProperty<E>(
+               ecripted: Boolean? = null,
+               unique: Boolean? = null,
+               index: Boolean? = null,
+               uniqueKey: String? = null,
+               indexKey: String? = null
+    ): PlatypusStringProperty<E> = PlatypusStringProperty<E>(
             string = string ?: "",
             help = help ?: "",
             regexp = pattern?.toRegex(),
@@ -54,7 +57,8 @@ class PlatypusPropertyFactory<E : PlatypusEntity>(private val model:AbstractPlat
              max: LocalDate? = null,
              defaultValue: LocalDate? = null,
              required: Boolean? = null,
-             readonly: Boolean? = null) =
+             readonly: Boolean? = null,
+             index: Boolean? = null) =
             PlatypusDateProperty<E>(
                     string = string ?: "",
                     help = help ?: "",
@@ -133,15 +137,15 @@ class PlatypusPropertyFactory<E : PlatypusEntity>(private val model:AbstractPlat
     fun boolean(string: String? = null,
                 help: String? = null,
                 required: Boolean? = null,
+                defaultValue: Boolean? = null,
                 widget: ColumnWidget? = null)
             = PlatypusBooleanProperty<E>(string ?: "",
             help = help ?: "",
             required = required ?: false,
             widget = widget ?: HtmlWidget())
 
-    fun <T : SelectionType> selection(columnName: String,
-                                      selection: T,
-                                      string: String = columnName,
+    fun <T : SelectionType> selection(string: String = "",
+                                      selection: KClass<T>,
                                       help: String = "",
                                       required: Boolean? = null,
                                       readonly: Boolean? = null,
@@ -149,18 +153,20 @@ class PlatypusPropertyFactory<E : PlatypusEntity>(private val model:AbstractPlat
     }
 
     fun one2many(string: String? = null,
-                 help: String? = null) = KassiopiaO2MColumnTmp(model, "")
+                 help: String? = null) = KassiopiaO2MColumnTmp(model)
 
-//    fun many2many(string: String? = null,
-//                  help: String? = null) = PlatypusM2MColumn(model, "")
+    fun many2many(string: String? = null,
+                  help: String? = null) = KassiopiaM2MColumnTmp(model)
 //
     fun many2one(string: String? = null,
                  help: String? = null,
                  required: Boolean? = null,
-                 readonly: Boolean? = null) = KassiopiaM2OColumnTmp()
+                 index: Boolean? = null,
+                 onDelete: ReferenceOption? = null,
+                 readonly: Boolean? = null) = KassiopiaM2OColumnTmp(model)
 }
 
-open class PlatypusProperty(var string: String, var help: String)
+open class PlatypusProperty(var string: String, var help: String = "")
 
 
 

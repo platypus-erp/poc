@@ -2,9 +2,7 @@ package org.platypus.modules.generator.orm
 
 import com.squareup.kotlinpoet.*
 import org.platypus.core.orm.methods.*
-import org.platypus.modules.data.MethodType
-import org.platypus.modules.data.ModelGenerate
-import org.platypus.modules.data.entityId
+import org.platypus.modules.data.*
 import org.platypus.modules.firstUpper
 
 /**
@@ -44,6 +42,7 @@ fun generateEntity(m: ModelGenerate): ModelEntiy {
         if (staticMethod.returnType.isNotBlank()){
             val rType = ClassName("", staticMethod.returnType)
             f.returns(rType)
+            f.addCode("return %T(%S)", rType, "")
             ctxType = staticMethod.type.withReturn.asParameterType(entity, paramType, rType)
         }
 
@@ -65,7 +64,7 @@ fun generateEntity(m: ModelGenerate): ModelEntiy {
     for (f in m.simpleField) {
         println("\t"+ f.name + " " + f.type)
         entityBuilder.addProperty(
-                f.type.templateGenerateEntity(f, table).build()
+                f.type.templateGenerateEntity(f, table).mutable(f.type != SimplePropertyType.ONE2MANY).build()
         )
     }
 
@@ -77,6 +76,7 @@ fun generateEntity(m: ModelGenerate): ModelEntiy {
         if (method.returnType.isNotBlank()){
             val rType = ClassName("", method.returnType)
             f.returns(rType)
+            f.addCode("return %T(%S)", rType, "")
             ctxType = method.type.withReturn.asParameterType(entity, paramType, rType)
         }
 

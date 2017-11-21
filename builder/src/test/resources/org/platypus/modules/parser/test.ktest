@@ -17,17 +17,17 @@ import platypus.entity.PartnerTitleEntity
  */
 object Partner : Model<PartnerEntity>() {
     //Simple String Field
-    val name = newfield.string()
+    val name = field.string()
     //Compute String Field
-    val displayName = compute(newfield.string())
-    val ref = computeStore(newfield.string(string = "Internal Reference"))
-    val date = newfield.date()
-    val title = newfield.many2one("title") of PartnerTitle
-    val parent = newfield.many2one("parent") of Partner
-    val parentName = newfield.string("Parent name", readonly = true/*, related= arrayOf("parent", "name")*/)
-    val email = newfield.string("Email", maxSize = 64, required = true)
-    val childIds = newfield.one2many("childIds") of Partner.id
-    val lang = newfield.many2one("Language") of ResLang
+    val displayName = compute(field.string())
+    val ref = computeStore(field.string(string = "Internal Reference"))
+    val date = field.date()
+    val title = field.many2one("title") of PartnerTitle
+    val parent = field.many2one("parent") of Partner
+    val parentName = field.string("Parent name", readonly = true/*, related= arrayOf("parent", "name")*/)
+    val email = field.string("Email", maxSize = 64, required = true)
+    val childIds = field.one2many("childIds") of Partner.id
+    val lang = field.many2one("Language") of ResLang
 
 
     val onChangeName = name.onChange { e, ctx ->

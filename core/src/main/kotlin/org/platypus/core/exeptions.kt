@@ -27,5 +27,7 @@ class RequestParameterNotFound(paramName: String, query: String) : NotFoundExcep
 
 
 class UserError(message:String):RuntimeException(message)
+class UserWarning(message:String):RuntimeException(message)
+class UserInfo(message:String):RuntimeException(message)
 
 class SelectionValueNotFound(t:SelectionType, v:Any?) : NotFoundException("$v not found in the type ${t::class.simpleName}")

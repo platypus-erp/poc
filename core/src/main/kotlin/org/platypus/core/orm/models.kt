@@ -3,9 +3,9 @@ package org.platypus.core.orm
 
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.ReferenceOption
+import org.jetbrains.exposed.sql.*
 import org.platypus.core.orm.fields.*
+import org.platypus.core.orm.methods.*
 import java.time.LocalDate
 
 /**
@@ -15,7 +15,13 @@ import java.time.LocalDate
  */
 open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
 
-    protected fun many2oneColumn(name: String, prop: PlatypusM2OColumnProperty, tableRef: PlatypusTable) = reference(name, tableRef)
+    val name: Column<String> = this.registerColumn("name", PlatypusStringColumnType(
+            "Name", "Name", null, 0, 50,
+            "", "", "", false,
+            true, false, TrimType.NONE, false)
+    )
+
+    protected fun many2oneColumn(name: String, prop: PlatypusM2OColumnProperty<*, *>, tableRef: PlatypusTable) = reference(name, tableRef).nullable()
 
     protected fun stringColumn(name: String, prop: PlatypusStringProperty<*>): Column<String> {
         return this.registerColumn(name,
@@ -54,27 +60,51 @@ open class PlatypusTable(tableName: String) : LongIdTable(tableName) {
         )
     }
 
-    protected fun one2manyColumn(name: String, propTarget: O2MColumn, target: Column<EntityID<Long>>): Column<EntityID<Long>> {
+    protected fun one2manyColumn(name: String, propTarget: O2MColumn<*, *>, target: Column<EntityID<Long>>): Column<EntityID<Long>> {
+        return this.reference(name, target)
+    }
+
+    protected fun optOne2manyColumn(name: String, propTarget: O2MColumn<*, *>, target: Column<EntityID<Long>?>): Column<EntityID<Long>?> {
         return this.reference(name, target)
     }
 }
 
 sealed class AbstractPlatypusModel<E : PlatypusEntity> {
 
-    protected val newfield = PlatypusPropertyFactory(this)
+    protected val field = PlatypusPropertyFactory(this)
     fun compute(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 
 }
 
-open class Model<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
-    val id = newfield.long()
+
+data class SearchByNameParam(var value: String,
+                             var operator: (col: ExpressionWithColumnType<String>, value: String) -> Op<Boolean>,
+                             var additionnalCond: Op<Boolean>,
+                             var limit: Int)
+
+open class Model<E : PlatypusEntity>(val compObj: PlatypusEntityClass<E, *>) : AbstractPlatypusModel<E>() {
+    val id = field.long()
+    val nameField = field.string("Name")
+
     protected val newMethod = PlatypusMethodsFactory<E>()
+
+    val nameGet = newMethod.one(
+            fun(e: E, p: Nothing, env: CTX<E, Nothing, String>): String {
+                return ""
+            }
+    )
+
+    val searchByName = newMethod.static(
+            fun(p: SearchByNameParam, env: StaticMethodResultWithReturn<E, SearchByNameParam, SizedIterable<E>>): SizedIterable<E> {
+                return compObj.find { (p.operator(compObj.platypusTable.name, p.value)) and p.additionnalCond }
+            }
+    )
 
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 }
 
 open class Inherit<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
-    val id = newfield.long()
+    val id = field.long()
     protected val newMethod = PlatypusMethodsFactory<E>()
 
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
@@ -86,17 +116,9 @@ open class InheritModel<E : PlatypusEntity> : AbstractPlatypusModel<E>() {
     protected fun computeStore(strProp: PlatypusStringProperty<E>) = ComputeStorePlatypusStringProperty(strProp)
 }
 
-open class Many2ManyTable(tableName: String = "") {
-    val table = PlatypusTable(tableName)
+open class Many2ManyTable(tableName: String = "") : PlatypusTable(tableName) {
 
-    protected fun ref(name: String, target: PlatypusTable, refOpt: ReferenceOption? = null): Column<EntityID<Long>> =
-            table.reference(name, target, refOpt)
-
-}
-
-open class Many2ManyModel(tableName: String = "") {
-
-    protected fun ref(target: AbstractPlatypusModel<*>, refOpt: ReferenceOption? = null) = PlatypusM2MColumn(target, refOpt)
+    protected fun ref(name: String, target: PlatypusTable, refOpt: ReferenceOption? = null) = reference(name, target, refOpt)
 
 }
 

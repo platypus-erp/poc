@@ -1,108 +1,76 @@
 package org.platypus.erp.base.models
 
 import org.platypus.core.orm.Model
-import org.platypus.core.orm.methods.*
+import org.platypus.core.orm.fields.SelectionType
 
 /**
  * @author chmuchme
  * @since 0.1
  * on 04/10/17.
  */
-//Code to write
-//object PartnerTags : Model<PartnerTagsEntity>() {
-//    val name = newfield.string()
-//    val shorcut = newfield.string()
-//}
 
-private const val tt: Int = 0
+enum class PartnerType : SelectionType {
+    CONTACT, INVOICE, DELIVRERY, SHIPPING, OTHER
+}
 
-data class MethodParamsTest(var s: String) : MultiMethodParams, OneMethodParams, StaticMethodParams
-data class MethodReturnTest(var s: String) : MultiMethodReturn, OneMethodReturn, StaticMethodReturn
+enum class CompanyType : SelectionType {
 
-//object PartnerTargsRel : Many2ManyModel(){
-//    val partner = ref(Partner)
-//    val tags = ref(PartnerTags)
-//}
+}
 
-object Partner : Model<PartnerEntity>() {
+object Partner : Model<PartnerEntity>(PartnerEntity) {
     //Simple String Field
-    val name = newfield.string()
+    val name = field.string(unique = true)
+    val date = field.date(index = true)
+    val title = field.many2one("title") of PartnerTitle
+    val parent = field.many2one("parent") of Partner
+    val parentName = field.string("Parent name", index = true)
+    val children = field.one2many("childIds") of Partner.id
+    val ref = computeStore(field.string(string = "Internal Reference", unique = true))
+    val lang = field.many2one("Language") of ResLang
+    val tz = field.string("Timezone",
+            help = """The partner's timezone, used to output proper date and time values
+inside printed reports. It is important to set a value for this field.
+You should use the same timezone that is otherwise used to pick and
+render date and time values: your computer's timezone.""")
+    val tzOffset = compute(field.string("Timezone Offset"))
+    val user = field.many2one("Salesperson",
+            help = "The internal user that is in charge of communicating with this contact if any.")
+
+    val vat = field.string("TIN", help = """Tax Identification Number.
+Fill it if the company is subjected to taxes.
+Used by the some of the legal statements.""")
+
+    val banks = field.one2many("Bank Accounts") of BankAccount.partner
+    val website = field.string("Website of Partner or Company")
+    val comment = field.text("Notes")
+    val categories = field.many2many("Tags") of PartnerCategorie
+    val creditlimit = field.decimal()
+    val barecode = field.string()
+    val active = field.boolean(defaultValue = true)
+    val customer = field.boolean("Is a Customer", "Check this box if this contact is a customer.", defaultValue = true)
+    val supplier = field.boolean("Is a Supplier", """Check this box if this contact is a vendor.
+If it's not checked, purchase people will not see it when encoding a purchase order.""")
+    val employee = field.boolean("is a employee", "Check this box if this contact is an Employee.")
+    val function = field.string("Job position")
+    val type = field.selection("Type", PartnerType::class)
+    val street = field.string()
+    val street2 = field.string()
+    val zip = field.string()
+    val city = field.string()
+    val state = field.many2one() of CountryState
+    val country = field.many2one() of Country
+    val email = field.string("Email", maxSize = 64, required = true, unique = true)
+    val emailFormatted = compute(field.string())
+    val phone = field.string()
+    val fax = field.string()
+    val mobile = field.string()
+    val iscompany = field.boolean()
+    val companyType = field.selection(selection = CompanyType::class)
+    val company = field.many2one() of Company
+
+
     //Compute String Field
-    val displayName = compute(newfield.string())
-    val ref = computeStore(newfield.string(string = "Internal Reference"))
-    val date = newfield.date()
-    val title = newfield.many2one("title") of PartnerTitle
-    val parent = newfield.many2one("parent") of Partner
-    val parentName = newfield.string("Parent name", readonly = true/*, related= arrayOf("parent", "name")*/)
-    val email = newfield.string("Email", maxSize = 64, required = true)
-    val childIds = newfield.one2many("childIds") of Partner.id
-//    val lang = newfield.many2one("Language") of ResLang
+    val displayName = compute(field.string(unique = true))
 
-
-    val onChangeName = name.onChange { e, ctx ->
-        ctx.withContext("TOTO" to 5).Super(e)
-    }
-
-//    val onChangeMultiProperty = newMethod.group(displayName, email).onChange(this::onChangeTest)
-
-    private fun onChangeTest(e: PartnerEntity, ctx: OnChangeResult<PartnerEntity>) {
-
-    }
-
-
-    val multiNoReturn = newMethod.multi { e, p: MethodParamsTest, s ->
-        s.Super(e, p)
-    }
-
-    internal val multiWithReturn = newMethod.multi(MethodReturnTest::class) { e, p: MethodParamsTest, s ->
-        s.Super(e, p) // implicit return
-    }
-
-    val oneNoReturn = newMethod.one { e, p: MethodParamsTest, s ->
-        s.Super(e, p)
-    }
-
-    val oneWithReturn = newMethod.one(MethodReturnTest::class) { e, p: MethodParamsTest, s ->
-        s.Super(e, p) // implicit return
-    }
-
-    val staticNoReturn = newMethod.static { p: MethodParamsTest, s ->
-        s.Super(p)
-    }
-
-    val staticWithReturn = newMethod.static(MethodReturnTest::class) { p: MethodParamsTest, s ->
-        s.Super(p) // implicit return
-    }
-
-    val compute_get_name = displayName.getter { e, c -> c.Super(e) }
-    val compute_set_name = displayName.setter { e, v, c -> c.Super(e, v) }
-
-    val compute_get_ref = ref.getter { e, c -> c.Super(e) }
-    val compute_set_ref = ref.setter { e, v, c -> c.Super(e, v) }
-
-
-}
-
-data class RE(val f: String) : MultiMethodReturn, MultiMethodParams
-object PartnerCategorie : Model<PartnerCategorieEntity>() {
-    val name = newfield.string("Category Name", required = true, translate = true)
-    val color = newfield.integer("color", "Color Index")
-    val parent_id = newfield.many2one("parent_id", "Parent Tag") of PartnerCategorie
-    //    complete_name = function(_name_get_fnc, type="char", stringColumn="Full Name"),
-    val complete_name = newfield.string(string = "Full Name")
-    val child_ids = newfield.one2many("parent_id", "Child Tag") of PartnerCategorie.id
-    val active = newfield.boolean(help = "The active choice allows you to hide the category without removing it.")
-    val parent_left = newfield.integer()
-    val parent_right = newfield.integer()
-
-    val onChangeTest = newMethod.multi { e, p: RE, r ->
-
-    }
-//    partner_id s= many2many("res.partner", id1="category_id", id2="partner_id", stringColumn="Partners"),
-}
-
-object PartnerTitle : Model<PartnerTitleEntity>() {
-    val name = newfield.string("name")
-    val sortcut = newfield.string("sortcut")
 
 }
